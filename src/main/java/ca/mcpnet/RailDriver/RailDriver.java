@@ -83,29 +83,8 @@ public class RailDriver extends JavaPlugin {
 				return false;
 			}
 			sender.sendMessage("Carving cavern radius "+ radius);
-			
-			Location curloc = player.getLocation();
-			for (int x = 0; x <= radius; x++) {
-				for (int z = 0; z <= radius; z++) {
-					for (int y = 0; y <= radius; y++) {
-						Location curPPloc = new Location(curloc.getWorld(), curloc.getX()+x,curloc.getY()+y,curloc.getZ()+z);
-						Location curPNloc = new Location(curloc.getWorld(), curloc.getX()+x,curloc.getY()+y,curloc.getZ()-z);
-						Location curNPloc = new Location(curloc.getWorld(), curloc.getX()-x,curloc.getY()+y,curloc.getZ()+z);
-						Location curNNloc = new Location(curloc.getWorld(), curloc.getX()-x,curloc.getY()+y,curloc.getZ()-z);
-						
-						// curloc.getWorld().playEffect(curPPloc, Effect.STEP_SOUND, curPPloc.getBlock().getTypeId());
-						// curloc.getWorld().playEffect(curPNloc, Effect.STEP_SOUND, curPNloc.getBlock().getTypeId());
-						// curloc.getWorld().playEffect(curNPloc, Effect.STEP_SOUND, curNPloc.getBlock().getTypeId());
-						// curloc.getWorld().playEffect(curNNloc, Effect.STEP_SOUND, curNNloc.getBlock().getTypeId());
-						if (curloc.distance(curPPloc) < radius) {
-							curPPloc.getBlock().setType(Material.AIR);
-							curPNloc.getBlock().setType(Material.AIR);
-							curNPloc.getBlock().setType(Material.AIR);
-							curNNloc.getBlock().setType(Material.AIR);
-						}
-					}
-				}
-			}
+			CavernCarverTask task = new CavernCarverTask(this, player.getLocation(), radius);
+			task.setTaskid(getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 10L, 4L));
 			return true;
 		}
 		
