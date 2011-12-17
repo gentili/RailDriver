@@ -10,3 +10,7 @@ commands:
       description: stock the player inventory with a developers kit of tools
       permission: <plugin name>.rd_devkit
       usage: <command> [player]
+   rd_cavern:
+      description: carve out a cavern from where the player is standing
+      permission: <plugin name>.rd_cavern
+      usage: <command> size [player]

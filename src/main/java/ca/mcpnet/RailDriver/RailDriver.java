@@ -2,11 +2,14 @@ package ca.mcpnet.RailDriver;
 
 import java.util.logging.Logger;
 
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -54,6 +57,59 @@ public class RailDriver extends JavaPlugin {
 		if (sender instanceof Player) {
 			player = (Player) sender;
 		}
+
+		// carve out a cavern from the players location outwards
+		if (cmd.getName().equals("rd_cavern")) {
+			if (args.length > 2) {
+				sender.sendMessage("Too many arguments!");
+				return false;
+			}
+			if (args.length == 2) {
+				player = getServer().getPlayer(args[1]);
+				if (player == null) {
+					sender.sendMessage("Player not found!");
+					return false;
+				}
+			}
+			if (player == null) {
+				sender.sendMessage("Must specify player when calling from server console!");
+				return false;
+			}
+			int radius = 0;
+			try {
+				radius = Integer.decode(args[0]);
+			} catch (NumberFormatException e) {
+				sender.sendMessage("Must specify the size of the cavern");
+				return false;
+			}
+			sender.sendMessage("Carving cavern radius "+ radius);
+			
+			Location curloc = player.getLocation();
+			for (int x = 0; x <= radius; x++) {
+				for (int z = 0; z <= radius; z++) {
+					for (int y = 0; y <= radius; y++) {
+						Location curPPloc = new Location(curloc.getWorld(), curloc.getX()+x,curloc.getY()+y,curloc.getZ()+z);
+						Location curPNloc = new Location(curloc.getWorld(), curloc.getX()+x,curloc.getY()+y,curloc.getZ()-z);
+						Location curNPloc = new Location(curloc.getWorld(), curloc.getX()-x,curloc.getY()+y,curloc.getZ()+z);
+						Location curNNloc = new Location(curloc.getWorld(), curloc.getX()-x,curloc.getY()+y,curloc.getZ()-z);
+						
+						// curloc.getWorld().playEffect(curPPloc, Effect.STEP_SOUND, curPPloc.getBlock().getTypeId());
+						// curloc.getWorld().playEffect(curPNloc, Effect.STEP_SOUND, curPNloc.getBlock().getTypeId());
+						// curloc.getWorld().playEffect(curNPloc, Effect.STEP_SOUND, curNPloc.getBlock().getTypeId());
+						// curloc.getWorld().playEffect(curNNloc, Effect.STEP_SOUND, curNNloc.getBlock().getTypeId());
+						if (curloc.distance(curPPloc) < radius) {
+							curPPloc.getBlock().setType(Material.AIR);
+							curPNloc.getBlock().setType(Material.AIR);
+							curNPloc.getBlock().setType(Material.AIR);
+							curNNloc.getBlock().setType(Material.AIR);
+						}
+					}
+				}
+			}
+			return true;
+		}
+		
+		// Stock the player with things useful for a developer of this plugin
 		if (cmd.getName().equals("rd_devkit")) {
 			if (args.length > 1) {
 				sender.sendMessage("Too many arguments!");
@@ -83,6 +139,8 @@ public class RailDriver extends JavaPlugin {
 			inventory.setArmorContents(devarmor);
 			return true;
 		}
+		
+		// Stock the player with materials required to build a raildriver
 		if (cmd.getName().equalsIgnoreCase("rd_stock")) {
 			// FIXME Should be able to stock a specific player
 			if (player == null) {
