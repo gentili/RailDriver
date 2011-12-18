@@ -82,9 +82,9 @@ public class RailDriver extends JavaPlugin {
 				sender.sendMessage("Must specify the size of the cavern");
 				return false;
 			}
-			sender.sendMessage("Carving cavern radius "+ radius);
-			CavernCarverTask task = new CavernCarverTask(this, player.getLocation(), radius);
-			task.setTaskid(getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 10L, 4L));
+			CavernCarverTask task = new CavernCarverTask(this, sender, player, player.getLocation(), radius);
+			task.setTaskid(getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 10L, 2L));
+			sender.sendMessage("Scheduled cavern carver job "+task.getTaskid()+" radius "+ radius);
 			return true;
 		}
 		
