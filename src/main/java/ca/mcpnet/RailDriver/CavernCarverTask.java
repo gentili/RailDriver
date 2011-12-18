@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -81,6 +82,18 @@ public class CavernCarverTask implements Runnable {
 	boolean breakBlock(Block block) {
 		if (block.isLiquid() || block.isEmpty() || block.getType() == Material.TORCH) {
 			return false;
+		}
+		// FIXME: Add other drops for wood and Lapis, etc...
+		if (block.getType() == Material.DIAMOND_ORE) {
+			block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.DIAMOND,(int) Math.round(Math.random()*3)+1));
+		} else if (block.getType() == Material.COAL_ORE) {
+			block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.COAL,1));
+		} else if (block.getType() == Material.IRON_ORE) {
+			block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.IRON_ORE,1));
+		} else if (block.getType() == Material.GOLD_ORE) {
+			block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.GOLD_ORE,1));
+		} else if (block.getType() == Material.REDSTONE_ORE) {
+			block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.REDSTONE,5));
 		}
 		block.getWorld().playEffect(block.getLocation(),Effect.STEP_SOUND, block.getTypeId());
 		block.setType(Material.AIR);
