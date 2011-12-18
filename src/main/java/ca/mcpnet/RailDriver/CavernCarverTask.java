@@ -6,10 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 public class CavernCarverTask implements Runnable {
 	RailDriver plugin;
@@ -44,7 +41,7 @@ public class CavernCarverTask implements Runnable {
 		for (; r <= radius; r++) {
 			for (; x <= r; x++) {
 				for (; z <= r; z++) {
-					for (int y = 0; y <= r; y++) {
+					for (; y <= r; y++) {
 						Location curPPloc = new Location(location.getWorld(),
 								location.getX() + x, location.getY() + y,
 								location.getZ() + z);
