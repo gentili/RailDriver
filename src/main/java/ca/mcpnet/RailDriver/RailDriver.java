@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
@@ -38,8 +39,7 @@ public class RailDriver extends JavaPlugin {
 	public void onEnable() {
 		log.info("RailDriver Plugin Enabled!");
 		pm = getServer().getPluginManager();
-		// pm.registerEvent(Event.Type.BLO, blockListener,
-		// Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 	}
 
 	public void onDisable() {
@@ -79,7 +79,7 @@ public class RailDriver extends JavaPlugin {
 			}
 			CavernCarverTask task = new CavernCarverTask(this, sender, player, player.getLocation(), radius);
 			task.setTaskid(getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 10L, 2L));
-			sender.sendMessage("Scheduled cavern carver job "+task.getTaskid()+" radius "+ radius);
+			sender.sendMessage("Scheduled cavern carver job "+task.getTaskid()+", radius "+ radius);
 			return true;
 		}
 		
@@ -122,6 +122,15 @@ public class RailDriver extends JavaPlugin {
 				return false;
 			} else {
 				sender.sendMessage("Yeah! Stock that fucker up!");
+				// 29 sticky piston
+				// 42 iron block
+				// 76 redstone torch
+				// 331 redstone
+				// 69 lever
+				// 61 furnace
+				// 23 dispencer
+				// 57 block of diamond
+				// 
 			}
 			return true;
 		}
