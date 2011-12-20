@@ -14,9 +14,12 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Diode;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.Furnace;
+import org.bukkit.material.Lever;
 import org.bukkit.material.PistonBaseMaterial;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.BlockIterator;
+import org.bukkit.util.Vector;
 
 public class RailDriver extends JavaPlugin {
 
@@ -256,6 +259,93 @@ public class RailDriver extends JavaPlugin {
 		raildriverblocklist[2][2][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
 	}
 
+	/**
+	 * This function will determine if this block is the 
+	 * lever block in a properly constructed RailDriver
+	 * @param railDriverBlockListener TODO
+	 * @param block TODO
+	 * @return
+	 */
+	boolean isRailDriver(RailDriverBlockListener railDriverBlockListener, Block block) {
+		// First is this block a lever block
+		if (block.getType() != Material.LEVER)
+			return false;
+		// What block is the lever attached to?
+		Lever lever = new Lever(block.getType(),block.getData());
+		BlockFace direction = lever.getAttachedFace();
+		Vector directionVector;
+		RailDriver.log.info(direction.name());
+		if (direction == BlockFace.NORTH) {
+			directionVector = new Vector(-1,0,0);
+		} else if (direction == BlockFace.SOUTH) {
+			directionVector = new Vector(1,0,0);
+		} else if (direction == BlockFace.EAST) {
+			directionVector = new Vector(0,0,-1);
+		} else if (direction == BlockFace.WEST) {
+			directionVector = new Vector(0,0,1);
+		} else {
+			return false;
+		}
+	
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 3; k++) {
+				Vector startBlock = null;
+				if (direction == BlockFace.NORTH) {
+					startBlock = new Vector(block.getX(),block.getY()-1+k,block.getZ()-1+j);
+				} else if (direction == BlockFace.EAST) {
+					startBlock = new Vector(block.getX()-1+j,block.getY()-1+k,block.getZ());
+				} else if (direction == BlockFace.WEST) {
+					startBlock = new Vector(block.getX()+1-j,block.getY()-1+k,block.getZ());
+				} else if (direction == BlockFace.SOUTH) {
+						startBlock = new Vector(block.getX(),block.getY()-1+k,block.getZ()+1-j);
+				} else {
+					return false;
+				}
+				/*
+				 * Some Handy code to generate code describing the machine
+				 * 
+				int i = 0;
+				BlockIterator bitr = new BlockIterator(block.getWorld(),startBlock,directionVector,0,10);
+				Block b;
+				while (bitr.hasNext()) {
+					b = bitr.next();
+					RailDriver.log.info("raildriverblocklist["+j+"]["+k+"]["+i+"] = new BlockTemplate(Material."+b.getType().name()+
+							", Facing.FIXME, false);");
+					i++;
+					if (b.getType() == Material.DIAMOND_BLOCK) {
+						RailDriver.log.info("// raildriverblocklist["+j+"]["+k+"] = new BlockTemplate["+(i)+"];");
+						break;
+					}
+				}
+				*/
+				RailDriver.log.info("Checking "+j+","+k);
+				BlockIterator bitr = new BlockIterator(block.getWorld(),startBlock,directionVector,0,10);// RailDriver.raildriverblocklist[1][1].length);
+				Block b = bitr.next();
+				boolean lastmatch = false;
+				for (int i = 0; i < RailDriver.raildriverblocklist[j][k].length; i++) {
+					if (lastmatch)
+						b = bitr.next();
+					if (b.getType() == Material.PISTON_MOVING_PIECE) {
+						break;
+					}
+					RailDriver.log.info("Checking Block "+b.getType().name()+ " against template "+i);
+					BlockTemplate bt = RailDriver.raildriverblocklist[j][k][i];
+					if (!bt.checkBlock(b, direction)) {
+						if (!bt.isOptional()) {
+							return false;
+						}
+						lastmatch = false;
+					} else {
+						lastmatch = true;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	// Bukkit Callbacks
+	
 	public void onEnable() {
 		log.info("RailDriver Plugin Enabled!");
 		pm = getServer().getPluginManager();
@@ -357,6 +447,6 @@ public class RailDriver extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 
 }
