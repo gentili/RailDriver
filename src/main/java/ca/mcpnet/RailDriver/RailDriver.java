@@ -1,10 +1,14 @@
 package ca.mcpnet.RailDriver;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -60,6 +64,8 @@ public class RailDriver extends JavaPlugin {
 			Material.DIAMOND_BLOCK,
 	};
 	static protected BlockTemplate[][][] raildriverblocklist;
+	
+	HashSet<RailDriverTask> taskset;
 	
 	static public enum Facing {
 		FORWARD,
@@ -128,7 +134,7 @@ public class RailDriver extends JavaPlugin {
 			// Does the block type match what's specified in the template?
 			boolean typematch = false;
 			for (int i = 0; i < materials.length; i++) {
-				log.info("  Match Type "+materials[i].name());
+				// log.info("  Match Type "+materials[i].name());
 				if (block.getType() == materials[i]) {
 					typematch = true;
 					break;
@@ -156,7 +162,7 @@ public class RailDriver extends JavaPlugin {
 			} else {
 				f = direction;
 			}
-			log.info("  Match Direction "+f.name());
+			// log.info("  Match Direction "+f.name());
 			return facing.checkFace(direction, f);
 		}
 
@@ -166,97 +172,97 @@ public class RailDriver extends JavaPlugin {
 	}
 
 	public RailDriver() {
-		super();
+		taskset = new HashSet<RailDriverTask>();
 		if (raildriverblocklist == null) {
 			raildriverblocklist = new BlockTemplate[3][3][];
-		}
 		
-		raildriverblocklist[0][0] = new BlockTemplate[7];
-		raildriverblocklist[0][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[0][0][1] = new BlockTemplate(Material.FURNACE, Facing.BACKWARD, false);
-		raildriverblocklist[0][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[0][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[0][0][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[0][0][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[0][0][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[0][1] = new BlockTemplate[8];
-		raildriverblocklist[0][1][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[0][1][1] = new BlockTemplate(Material.DISPENSER, Facing.BACKWARD, false);
-		raildriverblocklist[0][1][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[0][1][3] = new BlockTemplate(diodes, Facing.FORWARD, false);
-		raildriverblocklist[0][1][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[0][1][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[0][1][6] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[0][1][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[0][2] = new BlockTemplate[7];
-		raildriverblocklist[0][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[0][2][1] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[0][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
-		raildriverblocklist[0][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[0][2][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[0][2][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[0][2][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[1][0] = new BlockTemplate[8];
-		raildriverblocklist[1][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[1][0][1] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][0][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][0][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[1][0][6] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[1][0][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[1][1] = new BlockTemplate[9];
-		raildriverblocklist[1][1][0] = new BlockTemplate(Material.LEVER, Facing.FORWARD, false);
-		raildriverblocklist[1][1][1] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][1][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][1][3] = new BlockTemplate(diodes, Facing.FORWARD, false);
-		raildriverblocklist[1][1][4] = new BlockTemplate(diodes, Facing.FORWARD, false);
-		raildriverblocklist[1][1][5] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][1][6] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[1][1][7] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[1][1][8] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[1][2] = new BlockTemplate[8];
-		raildriverblocklist[1][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[1][2][1] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
-		raildriverblocklist[1][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
-		raildriverblocklist[1][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][2][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[1][2][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[1][2][6] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[1][2][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[2][0] = new BlockTemplate[7];
-		raildriverblocklist[2][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[2][0][1] = new BlockTemplate(Material.FURNACE, Facing.BACKWARD, false);
-		raildriverblocklist[2][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[2][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[2][0][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[2][0][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[2][0][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[2][1] = new BlockTemplate[8];
-		raildriverblocklist[2][1][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[2][1][1] = new BlockTemplate(Material.DISPENSER, Facing.BACKWARD, false);
-		raildriverblocklist[2][1][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[2][1][3] = new BlockTemplate(diodes, Facing.FORWARD, false);
-		raildriverblocklist[2][1][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[2][1][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[2][1][6] = new BlockTemplate(piston_extension, Facing.DONTCARE, true);
-		raildriverblocklist[2][1][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
-
-		raildriverblocklist[2][2] = new BlockTemplate[7];
-		raildriverblocklist[2][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[2][2][1] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-		raildriverblocklist[2][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
-		raildriverblocklist[2][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
-		raildriverblocklist[2][2][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
-		raildriverblocklist[2][2][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
-		raildriverblocklist[2][2][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+			raildriverblocklist[0][0] = new BlockTemplate[7];
+			raildriverblocklist[0][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[0][0][1] = new BlockTemplate(Material.FURNACE, Facing.BACKWARD, false);
+			raildriverblocklist[0][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[0][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[0][0][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[0][0][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[0][0][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[0][1] = new BlockTemplate[8];
+			raildriverblocklist[0][1][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[0][1][1] = new BlockTemplate(Material.DISPENSER, Facing.BACKWARD, false);
+			raildriverblocklist[0][1][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[0][1][3] = new BlockTemplate(diodes, Facing.FORWARD, false);
+			raildriverblocklist[0][1][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[0][1][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[0][1][6] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[0][1][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[0][2] = new BlockTemplate[7];
+			raildriverblocklist[0][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[0][2][1] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[0][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
+			raildriverblocklist[0][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[0][2][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[0][2][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[0][2][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[1][0] = new BlockTemplate[8];
+			raildriverblocklist[1][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[1][0][1] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][0][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][0][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[1][0][6] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[1][0][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[1][1] = new BlockTemplate[9];
+			raildriverblocklist[1][1][0] = new BlockTemplate(Material.LEVER, Facing.FORWARD, false);
+			raildriverblocklist[1][1][1] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][1][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][1][3] = new BlockTemplate(diodes, Facing.FORWARD, false);
+			raildriverblocklist[1][1][4] = new BlockTemplate(diodes, Facing.FORWARD, false);
+			raildriverblocklist[1][1][5] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][1][6] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[1][1][7] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[1][1][8] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[1][2] = new BlockTemplate[8];
+			raildriverblocklist[1][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[1][2][1] = new BlockTemplate(Material.CHEST, Facing.DONTCARE, false);
+			raildriverblocklist[1][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
+			raildriverblocklist[1][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][2][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[1][2][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[1][2][6] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[1][2][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[2][0] = new BlockTemplate[7];
+			raildriverblocklist[2][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[2][0][1] = new BlockTemplate(Material.FURNACE, Facing.BACKWARD, false);
+			raildriverblocklist[2][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[2][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[2][0][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[2][0][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[2][0][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[2][1] = new BlockTemplate[8];
+			raildriverblocklist[2][1][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[2][1][1] = new BlockTemplate(Material.DISPENSER, Facing.BACKWARD, false);
+			raildriverblocklist[2][1][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[2][1][3] = new BlockTemplate(diodes, Facing.FORWARD, false);
+			raildriverblocklist[2][1][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[2][1][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[2][1][6] = new BlockTemplate(piston_extension, Facing.DONTCARE, true);
+			raildriverblocklist[2][1][7] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+	
+			raildriverblocklist[2][2] = new BlockTemplate[7];
+			raildriverblocklist[2][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[2][2][1] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
+			raildriverblocklist[2][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
+			raildriverblocklist[2][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
+			raildriverblocklist[2][2][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
+			raildriverblocklist[2][2][5] = new BlockTemplate(piston_extension, Facing.FORWARD, true);
+			raildriverblocklist[2][2][6] = new BlockTemplate(piston_diamond, Facing.DONTCARE, false);
+		}
 	}
 
 	/**
@@ -274,7 +280,7 @@ public class RailDriver extends JavaPlugin {
 		Lever lever = new Lever(block.getType(),block.getData());
 		BlockFace direction = lever.getAttachedFace();
 		Vector directionVector;
-		RailDriver.log.info(direction.name());
+		// RailDriver.log.info(direction.name());
 		if (direction == BlockFace.NORTH) {
 			directionVector = new Vector(-1,0,0);
 		} else if (direction == BlockFace.SOUTH) {
@@ -318,7 +324,7 @@ public class RailDriver extends JavaPlugin {
 					}
 				}
 				*/
-				RailDriver.log.info("Checking "+j+","+k);
+				// RailDriver.log.info("Checking "+j+","+k);
 				BlockIterator bitr = new BlockIterator(block.getWorld(),startBlock,directionVector,0,10);// RailDriver.raildriverblocklist[1][1].length);
 				Block b = bitr.next();
 				boolean lastmatch = false;
@@ -328,7 +334,7 @@ public class RailDriver extends JavaPlugin {
 					if (b.getType() == Material.PISTON_MOVING_PIECE) {
 						break;
 					}
-					RailDriver.log.info("Checking Block "+b.getType().name()+ " against template "+i);
+					// RailDriver.log.info("Checking Block "+b.getType().name()+ " against template "+i);
 					BlockTemplate bt = RailDriver.raildriverblocklist[j][k][i];
 					if (!bt.checkBlock(b, direction)) {
 						if (!bt.isOptional()) {
@@ -448,5 +454,28 @@ public class RailDriver extends JavaPlugin {
 		return false;
 	}
 
-
+	public RailDriverTask findRemoveRailDriverTask(Block block) {
+		Iterator<RailDriverTask> itr = taskset.iterator();
+		while(itr.hasNext()) {
+			RailDriverTask task = itr.next();
+			if (task.matchBlock(block)) {
+				taskset.remove(task);
+				return task;
+			}
+		}
+		return null;
+	}
+	public RailDriverTask findCreateRailDriverTask(Block block) {
+		Iterator<RailDriverTask> itr = taskset.iterator();
+		while(itr.hasNext()) {
+			RailDriverTask task = itr.next();
+			if (task.matchBlock(block)) {
+				return task;
+			}
+		}
+		// Create a new task
+		RailDriverTask task = new RailDriverTask(this, block);
+		taskset.add(task);
+		return task;
+	}
 }

@@ -15,11 +15,18 @@ public class RailDriverBlockListener extends BlockListener {
 	@Override
 	public void onBlockRedstoneChange(BlockRedstoneEvent event) {
 		if (event.getBlock().getType() == Material.LEVER) {
-			RailDriver.log.info(event.getOldCurrent()+"->"+event.getNewCurrent());
 			if (plugin.isRailDriver(this, event.getBlock())) {
-				RailDriver.log.info("It's a raildriver!");
-			} else {
-				RailDriver.log.info("Not a raildriver!");
+				if (event.getOldCurrent() < event.getNewCurrent()) {
+					// We're attempting to activate a raildriver
+					RailDriverTask task = plugin.findCreateRailDriverTask(event.getBlock());
+					task.activate();
+				} else {
+					// We're attempting to deactivate an existing raildriver
+					RailDriverTask task = plugin.findRemoveRailDriverTask(event.getBlock());
+					if (task != null) {
+						task.deactivate();
+					}
+				}
 			}
 		}
 	}
