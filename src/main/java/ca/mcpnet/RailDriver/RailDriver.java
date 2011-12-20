@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -93,22 +94,22 @@ public class RailDriver extends JavaPlugin {
 			if (this == DOWN) {
 				return blockdirection == BlockFace.DOWN;
 			}
-			BlockFace expectedDirection;
-			if (direction == BlockFace.NORTH) {
-				expectedDirection = horizBlockFaceArray[this.ordinal()];
-			} else if (direction == BlockFace.WEST) {
-				expectedDirection = horizBlockFaceArray[(this.ordinal() + 1) % 4];
-			} else if (direction == BlockFace.SOUTH) {
-				expectedDirection = horizBlockFaceArray[(this.ordinal() + 2) % 4];
-			} else if (direction == BlockFace.EAST) {
-				expectedDirection = horizBlockFaceArray[(this.ordinal() + 3) % 4];
-			} else {
-				// Should never get here, but if we do then this block is definitely not 
-				// facing a legal direction
-				return false;
-			}
-			
+			BlockFace expectedDirection = translate(direction,blockdirection);			
 			return expectedDirection == blockdirection;
+		}
+		
+		public BlockFace translate(BlockFace direction, BlockFace blockdirection) {
+			if (direction == BlockFace.NORTH) {
+				return horizBlockFaceArray[this.ordinal()];
+			} else if (direction == BlockFace.WEST) {
+				return horizBlockFaceArray[(this.ordinal() + 1) % 4];
+			} else if (direction == BlockFace.SOUTH) {
+				return horizBlockFaceArray[(this.ordinal() + 2) % 4];
+			} else if (direction == BlockFace.EAST) {
+				return horizBlockFaceArray[(this.ordinal() + 3) % 4];
+			} else {
+				return null;
+			}
 		}
 	}
 	
@@ -349,7 +350,7 @@ public class RailDriver extends JavaPlugin {
 		}
 		return true;
 	}
-	
+
 	// Bukkit Callbacks
 	
 	public void onEnable() {
