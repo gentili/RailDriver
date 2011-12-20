@@ -64,6 +64,14 @@ public class RailDriverBlockListener extends BlockListener {
 				Vector startBlock = null;
 				if (direction == BlockFace.NORTH) {
 					startBlock = new Vector(block.getX(),block.getY()-1+k,block.getZ()-1+j);
+				} else if (direction == BlockFace.EAST) {
+					startBlock = new Vector(block.getX()-1+j,block.getY()-1+k,block.getZ());
+				} else if (direction == BlockFace.WEST) {
+					startBlock = new Vector(block.getX()+1-j,block.getY()-1+k,block.getZ());
+				} else if (direction == BlockFace.SOUTH) {
+						startBlock = new Vector(block.getX(),block.getY()-1+k,block.getZ()+1-j);
+				} else {
+					return false;
 				}
 				/*
 				 * Some Handy code to generate code describing the machine
@@ -89,6 +97,9 @@ public class RailDriverBlockListener extends BlockListener {
 				for (int i = 0; i < RailDriver.raildriverblocklist[j][k].length; i++) {
 					if (lastmatch)
 						b = bitr.next();
+					if (b.getType() == Material.PISTON_MOVING_PIECE) {
+						break;
+					}
 					RailDriver.log.info("Checking Block "+b.getType().name()+ " against template "+i);
 					BlockTemplate bt = RailDriver.raildriverblocklist[j][k][i];
 					if (!bt.checkBlock(b, direction)) {
