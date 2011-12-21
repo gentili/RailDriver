@@ -143,7 +143,11 @@ public class RailDriver extends JavaPlugin {
 			// Does the block type match what's specified in the template?
 			boolean typematch = false;
 			for (int i = 0; i < materials.length; i++) {
-				// log.info("  Match Type "+materials[i].name());
+				// log.info("  Match Type "+materials[i].name())
+				// Treat air as a dontcare
+				if (materials[i] == Material.AIR) {
+					return true;
+				}
 				if (block.getType() == materials[i]) {
 					typematch = true;
 					break;
@@ -341,9 +345,6 @@ public class RailDriver extends JavaPlugin {
 				for (int i = 0; i < RailDriver.raildriverblocklist[j][k].length; i++) {
 					if (lastmatch)
 						b = bitr.next();
-					if (b.getType() == Material.PISTON_MOVING_PIECE) {
-						break;
-					}
 					// RailDriver.log.info("Checking Block "+b.getType().name()+ " against template "+i);
 					BlockTemplate bt = RailDriver.raildriverblocklist[j][k][i];
 					if (!bt.checkBlock(b, direction)) {

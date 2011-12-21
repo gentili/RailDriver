@@ -92,7 +92,6 @@ public class RailDriverTask implements Runnable {
 		block.setData(leverblock.getData());
 	}
 	public void run() {
-		// RailDriver.log.info("Updating Raildriver "+taskid);
 		iteration++;
 		// Check that it's still a raildriver
 		/*
@@ -142,10 +141,29 @@ public class RailDriverTask implements Runnable {
 		}
 		if (iteration == 36) {
 			setDrillSwitch(false);
-			iteration = 0;
 		}
-		if (iteration == 38) {
+		if (iteration == 40) {
+			world.playEffect(getRelativeBlock(0,1,-1).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
 			// Do track laying stuff
+		}
+		if (iteration == 42) {
+			world.playEffect(getRelativeBlock(0,0,-1).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
+			world.playEffect(getRelativeBlock(0,2,-1).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
+			// Do track laying stuff			
+		}
+		if (iteration == 44) {
+			world.playEffect(getRelativeBlock(0,-1,1).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
+			world.playEffect(getRelativeBlock(0,3,1).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
+			// Do track laying stuff			
+		}
+		if (iteration == 46) {
+			world.playEffect(getRelativeBlock(1,-1,2).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
+			world.playEffect(getRelativeBlock(1,3,2).getLocation(), Effect.STEP_SOUND, Material.LAVA.getId());
+			// Do track laying stuff			
+		}
+		if (iteration == 48) {
+			world.createExplosion(getRelativeBlock(2,1,1).getLocation(), 0);
+			iteration = 0;
 		}
 		
 		// world.playEffect(block.getLocation(), Effect.STEP_SOUND, block.getTypeId());
