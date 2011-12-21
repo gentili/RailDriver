@@ -29,6 +29,7 @@ public class RailDriverTask implements Runnable {
 	private int taskid;
 	int iteration;
 	int distance;
+	boolean nexttorch;
 	ArrayList<ItemStack> collecteditems;
 	Iterator<ItemStack> itemitr;
 	boolean whichdispenser;
@@ -45,6 +46,7 @@ public class RailDriverTask implements Runnable {
 		taskid = -1;
 		iteration = 0;
 		distance = 0;
+		nexttorch = false;
 		collecteditems = new ArrayList<ItemStack>();
 		whichdispenser = false;
 		if (direction == BlockFace.EAST) {
@@ -159,7 +161,6 @@ public class RailDriverTask implements Runnable {
 			// Do track laying stuff			
 		}
 		if (iteration == 48) {
-			world.createExplosion(getRelativeBlock(2,1,1).getLocation(), 0);
 			// Check that it's still a raildriver
 			Block leverblock = world.getBlockAt(x, y, z);
 			if (!plugin.isRailDriver(leverblock)) {
@@ -168,7 +169,12 @@ public class RailDriverTask implements Runnable {
 				deactivate();
 				return;
 			}
-			advance();
+			if (!advance()) {
+				RailDriver.log.info("Unstable environment encountered!");
+				deactivate();
+				return;
+			}
+			world.createExplosion(getRelativeBlock(2,1,1).getLocation(), 0);
 			iteration = 0;
 		}
 		
@@ -182,7 +188,24 @@ public class RailDriverTask implements Runnable {
 		// Light the fires
 	}
 	
-	private void advance() {
+	private boolean advance() {
+		// Check to make sure ground under is solid
+		for (int lx = 0; lx < 3; lx++) {
+			for (int lz = 0; lz < RailDriver.raildriverblocklist[lx][0].length; lz++) {
+				Block block = getRelativeBlock(lz,lx,-1);
+				if (block.isEmpty() || block.isLiquid()) {
+					return false;
+				}
+			}
+		}
+		// Check to make sure behind has no liquid
+		for (int lx = 0; lx < 3; lx++) {
+			Block block = getRelativeBlock(0,lx,0);
+			if (block.isLiquid()) {
+				return false;
+			}			
+		}
+		
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				for (int lz = RailDriver.raildriverblocklist[lx][ly].length; lz > 0; lz--) {
@@ -231,10 +254,19 @@ public class RailDriverTask implements Runnable {
 				}
 			}
 		}
-		int period = 4;
-		if (distance % period == 0) { // Time for a left rail
+		int period = 8;
+		if (distance % period == 0) {
+			for (int ly = 0; ly < 3; ly++) {
+				getRelativeBlock(1,-1,ly-1).setTypeId(98);
+				getRelativeBlock(1,3,ly-1).setTypeId(98);
+			}
+			
 			Block left = getRelativeBlock(1,0,1);
-			left.setType(Material.REDSTONE_TORCH_ON);
+			if (nexttorch) {
+				left.setType(Material.REDSTONE_TORCH_ON);
+			} else {
+				left.setType(Material.TORCH);				
+			}
 			Torch lefttorch = new Torch(left.getType(),left.getData());
 			lefttorch.setFacingDirection(Facing.RIGHT.translate(direction));
 			left.setData(lefttorch.getData());
@@ -242,24 +274,16 @@ public class RailDriverTask implements Runnable {
 			getRelativeBlock(1,1,0).setType(Material.POWERED_RAIL);
 
 			Block right = getRelativeBlock(1,2,1);
-			right.setType(Material.TORCH);
+			if (nexttorch) {
+				right.setType(Material.TORCH);				
+			} else {
+				right.setType(Material.REDSTONE_TORCH_ON);
+			}
 			Torch righttorch = new Torch(right.getType(),right.getData());
 			righttorch.setFacingDirection(Facing.LEFT.translate(direction));
 			right.setData(righttorch.getData());
-		} else if (distance % period == period/2) { // Time for right rail
-			Block left = getRelativeBlock(1,0,1);
-			left.setType(Material.TORCH);
-			Torch lefttorch = new Torch(left.getType(),left.getData());
-			lefttorch.setFacingDirection(Facing.RIGHT.translate(direction));
-			left.setData(lefttorch.getData());
-
-			getRelativeBlock(1,1,0).setType(Material.POWERED_RAIL);
-
-			Block right = getRelativeBlock(1,2,1);
-			right.setType(Material.REDSTONE_TORCH_ON);
-			Torch righttorch = new Torch(right.getType(),right.getData());
-			righttorch.setFacingDirection(Facing.LEFT.translate(direction));
-			right.setData(righttorch.getData());
+			
+			nexttorch = !nexttorch;
 		} else { // Regular rail
 			getRelativeBlock(1,1,0).setType(Material.RAILS);
 		}
@@ -270,6 +294,7 @@ public class RailDriverTask implements Runnable {
 		x = newloc.getBlockX();
 		y = newloc.getBlockY();
 		z = newloc.getBlockZ();
+		return true;
 	}
 
 	private void ejectItems() {
