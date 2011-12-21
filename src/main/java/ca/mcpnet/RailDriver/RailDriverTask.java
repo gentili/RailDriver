@@ -50,6 +50,12 @@ public class RailDriverTask implements Runnable {
 		}
 	}
 
+	void setDrillBit(boolean on) {
+		Block block = getRelativeBlock(2,1,2);
+		Lever leverblock = new Lever(block.getType(),block.getData());
+		leverblock.setPowered(on);
+		block.setData(leverblock.getData());
+	}
 	public void run() {
 		// RailDriver.log.info("Updating Raildriver "+taskid);
 		iteration++;
@@ -63,24 +69,37 @@ public class RailDriverTask implements Runnable {
 			return;
 		}
 		*/
-		if (iteration % 100 == 1) {
-			Block block = getRelativeBlock(2,1,2);
-			Lever leverblock = new Lever(block.getType(),block.getData());
-			leverblock.setPowered(false);
-			block.setData(leverblock.getData());
+		if (iteration == 1) {
+			setDrillBit(false);
 		}
-		if (iteration % 100 == 8) {
-			Block block = getRelativeBlock(2,1,2);
-			Lever leverblock = new Lever(block.getType(),block.getData());
-			leverblock.setPowered(true);
-			block.setData(leverblock.getData());
+		if (iteration == 6) {
+			// Remove materials in front of bit
+			setDrillBit(true);
 		}
-		if (iteration % 100 == 16) {
-			Block block = getRelativeBlock(2,1,2);
-			Lever leverblock = new Lever(block.getType(),block.getData());
-			leverblock.setPowered(false);
-			block.setData(leverblock.getData());
-			iteration = 1;
+		if (iteration == 8) {
+			world.createExplosion(getRelativeBlock(6,1,1).getLocation(), 0);
+		}
+		if (iteration == 12) {
+			setDrillBit(false);
+		}
+		if (iteration == 18) {
+			setDrillBit(true);
+		}
+		if (iteration == 20) {
+			world.createExplosion(getRelativeBlock(6,1,1).getLocation(), 0);
+		}
+		if (iteration == 24) {
+			setDrillBit(false);
+		}
+		if (iteration == 30) {
+			setDrillBit(true);
+		}
+		if (iteration == 32) {
+			world.createExplosion(getRelativeBlock(6,1,1).getLocation(), 0);
+		}
+		if (iteration == 40) {
+			// Do track laying noises
+			iteration = 0;
 		}
 		
 		// world.playEffect(block.getLocation(), Effect.STEP_SOUND, block.getTypeId());
