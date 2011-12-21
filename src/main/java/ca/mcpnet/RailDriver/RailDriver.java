@@ -1,15 +1,12 @@
 package ca.mcpnet.RailDriver;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -58,19 +55,12 @@ public class RailDriver extends JavaPlugin {
 	private final Material[] piston_base = {
 			Material.PISTON_STICKY_BASE,
 	};
-	private final Material[] piston_extension = {
-			Material.PISTON_EXTENSION,
-	};
 	private final Material[] piston_diamond = {
 			Material.DIAMOND_BLOCK,
 	};
 	private final Material[] furnaces = {
 			Material.FURNACE,
 			Material.BURNING_FURNACE
-	};
-	private final Material[] redstone_torches = {
-			Material.REDSTONE_TORCH_OFF,
-			Material.REDSTONE_TORCH_ON
 	};
 	static protected BlockTemplate[][][] raildriverblocklist;
 	
@@ -102,11 +92,11 @@ public class RailDriver extends JavaPlugin {
 			if (this == DOWN) {
 				return blockdirection == BlockFace.DOWN;
 			}
-			BlockFace expectedDirection = translate(direction,blockdirection);			
+			BlockFace expectedDirection = translate(direction);			
 			return expectedDirection == blockdirection;
 		}
 		
-		public BlockFace translate(BlockFace direction, BlockFace blockdirection) {
+		public BlockFace translate(BlockFace direction) {
 			if (direction == BlockFace.NORTH) {
 				return horizBlockFaceArray[this.ordinal()];
 			} else if (direction == BlockFace.WEST) {

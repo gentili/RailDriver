@@ -2,7 +2,6 @@ package ca.mcpnet.RailDriver;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -10,21 +9,17 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Furnace;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Chest;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
-import org.bukkit.material.RedstoneTorch;
-import org.bukkit.util.Vector;
-
-import ca.mcpnet.RailDriver.RailDriver.Facing;
+import org.bukkit.material.MaterialData;
 
 public class RailDriverTask implements Runnable {
 
 	private RailDriver plugin;
 	private int x,y,z;
 	private BlockFace direction;
-	private boolean shutdown;
 	private World world;
 	private int taskid;
 	int iteration;
@@ -41,7 +36,6 @@ public class RailDriverTask implements Runnable {
 		z = block.getZ();
 		Lever lever = new Lever(block.getType(),block.getData());
 		direction = lever.getAttachedFace();
-		shutdown = false;
 		world = block.getWorld();
 		taskid = -1;
 		iteration = 0;
@@ -169,8 +163,7 @@ public class RailDriverTask implements Runnable {
 				deactivate();
 				return;
 			}
-			// Now move it!
-			//advance();
+			advance();
 			iteration = 0;
 		}
 		
@@ -188,15 +181,46 @@ public class RailDriverTask implements Runnable {
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				for (int lz = RailDriver.raildriverblocklist[lx][ly].length; lz > 0; lz--) {
-					if (RailDriver.raildriverblocklist[lx][ly][lz-1].materials[0] != Material.AIR) {
-						Block target = getRelativeBlock(lz,lx,ly);
-						Block source = getRelativeBlock(lz-1,lx,ly);
-						target.setTypeIdAndData(source.getTypeId(), source.getData(), false);
+					Block target = getRelativeBlock(lz,lx,ly);
+					Block source = getRelativeBlock(lz-1,lx,ly);
+					// RailDriver.log.info(source.getType().name());
+					if (source.getType() == Material.CHEST) {
+						// Get the old chest info
+						Chest sourcechest = (Chest) source.getState();
+						Inventory sourceinventory = sourcechest.getInventory();
+						ItemStack[] sourceitems = sourceinventory.getContents();
+						sourceinventory.clear();
+						MaterialData sourcedata = sourcechest.getData();
+						// Blow the old chest away
 						source.setType(Material.AIR);
+						
+						target.setType(Material.CHEST);
+						Chest targetchest = (Chest) target.getState();
+						targetchest.setData(sourcedata);
+						Inventory targetinventory = targetchest.getInventory();
+						targetinventory.setContents(sourceitems);
+						targetchest.update();
+					} else if (source.getType() == Material.DISPENSER || 
+							source.getType() == Material.FURNACE ||
+							source.getType() == Material.BURNING_FURNACE || 
+							source.getType() == Material.LEVER) {
+						byte sourcedata = source.getData();
+						Material sourcematerial = source.getType();
+						source.setType(Material.AIR);
+						target.setType(sourcematerial);
+						target.setData(sourcedata);
+					} else {
+						target.setType(source.getType());
+						target.setData(source.getData());
+						if (lz == 1) {
+							source.setType(Material.AIR);
+						}
 					}
 				}
 			}
 		}
+		// plugin.getServer().getScheduler().cancelTask(taskid);
+		// plugin.taskset.remove(this);
 		Location newloc = getRelativeBlock(1,1,1).getLocation();
 		x = newloc.getBlockX();
 		y = newloc.getBlockY();
