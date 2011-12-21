@@ -18,7 +18,7 @@ public class RailDriverBlockListener extends BlockListener {
 			if (event.getOldCurrent() > event.getNewCurrent()) {
 				// If theres a raildriver task associated with this lever then 
 				// we're attempting to deactivate an existing raildriver
-				RailDriverTask task = plugin.findRemoveRailDriverTask(event.getBlock());
+				RailDriverTask task = plugin.findRailDriverTask(event.getBlock());
 				if (task != null) {
 					task.deactivate();
 				}

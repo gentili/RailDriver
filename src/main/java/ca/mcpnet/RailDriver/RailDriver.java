@@ -464,12 +464,11 @@ public class RailDriver extends JavaPlugin {
 		return false;
 	}
 
-	public RailDriverTask findRemoveRailDriverTask(Block block) {
+	public RailDriverTask findRailDriverTask(Block block) {
 		Iterator<RailDriverTask> itr = taskset.iterator();
 		while(itr.hasNext()) {
 			RailDriverTask task = itr.next();
 			if (task.matchBlock(block)) {
-				taskset.remove(task);
 				return task;
 			}
 		}
