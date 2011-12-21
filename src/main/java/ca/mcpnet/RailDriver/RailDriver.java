@@ -64,6 +64,10 @@ public class RailDriver extends JavaPlugin {
 	private final Material[] piston_diamond = {
 			Material.DIAMOND_BLOCK,
 	};
+	private final Material[] furnaces = {
+			Material.FURNACE,
+			Material.BURNING_FURNACE
+	};
 	static protected BlockTemplate[][][] raildriverblocklist;
 	
 	HashSet<RailDriverTask> taskset;
@@ -154,7 +158,8 @@ public class RailDriver extends JavaPlugin {
 			} else if (block.getType() == Material.PISTON_STICKY_BASE) {
 				PistonBaseMaterial piston = new PistonBaseMaterial(block.getType(),block.getData());
 				f = piston.getFacing();
-			} else if (block.getType() == Material.FURNACE) {
+			} else if (block.getType() == Material.FURNACE ||
+					block.getType() == Material.BURNING_FURNACE) {
 				Furnace furnace = new Furnace(block.getType(),block.getData());
 				f = furnace.getFacing();
 			} else if (block.getType() == Material.DISPENSER) {
@@ -179,7 +184,7 @@ public class RailDriver extends JavaPlugin {
 		
 			raildriverblocklist[0][0] = new BlockTemplate[7];
 			raildriverblocklist[0][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-			raildriverblocklist[0][0][1] = new BlockTemplate(Material.FURNACE, Facing.BACKWARD, false);
+			raildriverblocklist[0][0][1] = new BlockTemplate(furnaces, Facing.BACKWARD, false);
 			raildriverblocklist[0][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
 			raildriverblocklist[0][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
 			raildriverblocklist[0][0][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
@@ -238,7 +243,7 @@ public class RailDriver extends JavaPlugin {
 	
 			raildriverblocklist[2][0] = new BlockTemplate[7];
 			raildriverblocklist[2][0][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
-			raildriverblocklist[2][0][1] = new BlockTemplate(Material.FURNACE, Facing.BACKWARD, false);
+			raildriverblocklist[2][0][1] = new BlockTemplate(furnaces, Facing.BACKWARD, false);
 			raildriverblocklist[2][0][2] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
 			raildriverblocklist[2][0][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
 			raildriverblocklist[2][0][4] = new BlockTemplate(piston_base, Facing.FORWARD, false);
@@ -354,7 +359,7 @@ public class RailDriver extends JavaPlugin {
 	// Bukkit Callbacks
 	
 	public void onEnable() {
-		log.info("RailDriver Plugin Enabled!");
+		// log.info("RailDriver Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);

@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Furnace;
 import org.bukkit.material.Lever;
 import org.bukkit.util.Vector;
 
@@ -52,14 +53,16 @@ public class RailDriverTask implements Runnable {
 
 	public void run() {
 		RailDriver.log.info("Updating Raildriver "+taskid);
+		Block block = getRelativeBlock(2,1,1);
+		
+		world.playEffect(block.getLocation(), Effect.STEP_SOUND, block.getTypeId());
 		/*
 		Block block = this.getRelativeBlock(1, 0, i);
-		i++;
+		i = (i + 1) % 3;
 		RailDriver.log.info(block.getType().name());
-		// world.createExplosion(x, y, z, 0);
-		// world.playEffect(block.getLocation(), Effect.STEP_SOUND, block.getTypeId());
-		// Light the fires
 		*/
+		// world.createExplosion(x, y, z, 0);
+		// Light the fires
 	}
 	
 	public boolean matchBlock(Block block) {
@@ -70,13 +73,27 @@ public class RailDriverTask implements Runnable {
 		}
 		return false;
 	}
+	public void setBlockTypeSaveData(Block block, Material type) {
+		byte data = block.getData();
+		block.setType(type);
+		block.setData(data);		
+	}
 	public void activate() {
 		if (taskid != -1) {
 			RailDriver.log.warning("Activation requested on already active raildriver "+taskid);
 			return;
 		}
-		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 20L);
+		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 10L);
 		RailDriver.log.info("Activated "+direction.name()+ " raildriver "+taskid);
+		// Light the fires
+		RailDriver.log.info(getRelativeBlock(1,0,0).getType().name());
+
+		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.BURNING_FURNACE);
+		setBlockTypeSaveData(getRelativeBlock(1,2,0), Material.BURNING_FURNACE);
+		
+		// Furnace furnace = (Furnace) getRelativeBlock(1,0,0).getState();
+		// furnace.setType(Material.BURNING_FURNACE);
+		// furnace.update();
 	}
 	
 	public void deactivate() {
@@ -85,6 +102,12 @@ public class RailDriverTask implements Runnable {
 			return;
 		}
 		plugin.getServer().getScheduler().cancelTask(taskid);
-		RailDriver.log.info("Deactivated raildriver "+taskid);		
+		RailDriver.log.info("Deactivated raildriver "+taskid);
+
+		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.FURNACE);
+		setBlockTypeSaveData(getRelativeBlock(1,2,0), Material.FURNACE);
+		// Furnace furnace = (Furnace) getRelativeBlock(1,0,0).getState();
+		// furnace.setsetType(Material.FURNACE);
+		// furnace.update();
 	}
 }
