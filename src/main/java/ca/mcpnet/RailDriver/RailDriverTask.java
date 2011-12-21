@@ -96,6 +96,7 @@ public class RailDriverTask implements Runnable {
 			setMainSwitch(false);
 			setDrillSwitch(false);
 			world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
+			smokePuff();
 			plugin.taskset.remove(this);
 		}
 
@@ -186,7 +187,7 @@ public class RailDriverTask implements Runnable {
 	private void advance() {
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
-				for (int lz = RailDriver.raildriverblocklist[lx][ly].length - 1; lz > 0; lz--) {
+				for (int lz = RailDriver.raildriverblocklist[lx][ly].length; lz > 0; lz--) {
 					if (RailDriver.raildriverblocklist[lx][ly][lz-1].materials[0] != Material.AIR) {
 						Block target = getRelativeBlock(lz,lx,ly);
 						Block source = getRelativeBlock(lz-1,lx,ly);
@@ -225,7 +226,7 @@ public class RailDriverTask implements Runnable {
 	private boolean excavate() {
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
-				Block block = getRelativeBlock((RailDriver.raildriverblocklist[lx][ly]).length - 1, lx, ly);
+				Block block = getRelativeBlock((RailDriver.raildriverblocklist[lx][ly]).length, lx, ly);
 				if (block.isLiquid()) {					
 					return false; 
 				}
@@ -278,6 +279,7 @@ public class RailDriverTask implements Runnable {
 		RailDriver.log.info("Deactivated raildriver "+taskid);
 		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.FURNACE);
 		setBlockTypeSaveData(getRelativeBlock(1,2,0), Material.FURNACE);
+		world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
 		taskid = -1;
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, this, 10L);
 	}
