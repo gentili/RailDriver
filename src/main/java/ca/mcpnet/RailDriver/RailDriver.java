@@ -68,6 +68,10 @@ public class RailDriver extends JavaPlugin {
 			Material.FURNACE,
 			Material.BURNING_FURNACE
 	};
+	private final Material[] redstone_torches = {
+			Material.REDSTONE_TORCH_OFF,
+			Material.REDSTONE_TORCH_ON
+	};
 	static protected BlockTemplate[][][] raildriverblocklist;
 	
 	HashSet<RailDriverTask> taskset;
@@ -234,7 +238,7 @@ public class RailDriver extends JavaPlugin {
 			raildriverblocklist[1][2] = new BlockTemplate[8];
 			raildriverblocklist[1][2][0] = new BlockTemplate(Material.AIR, Facing.DONTCARE, false);
 			raildriverblocklist[1][2][1] = new BlockTemplate(Material.CHEST, Facing.DONTCARE, false);
-			raildriverblocklist[1][2][2] = new BlockTemplate(Material.REDSTONE_WIRE, Facing.FORWARD, false);
+			raildriverblocklist[1][2][2] = new BlockTemplate(Material.LEVER, Facing.DONTCARE, false);
 			raildriverblocklist[1][2][3] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
 			raildriverblocklist[1][2][4] = new BlockTemplate(Material.IRON_BLOCK, Facing.DONTCARE, false);
 			raildriverblocklist[1][2][5] = new BlockTemplate(piston_base, Facing.FORWARD, false);
@@ -278,7 +282,7 @@ public class RailDriver extends JavaPlugin {
 	 * @param block TODO
 	 * @return
 	 */
-	boolean isRailDriver(RailDriverBlockListener railDriverBlockListener, Block block) {
+	boolean isRailDriver(Block block) {
 		// First is this block a lever block
 		if (block.getType() != Material.LEVER)
 			return false;

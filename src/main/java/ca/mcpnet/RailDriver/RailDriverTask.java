@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Furnace;
 import org.bukkit.material.Lever;
+import org.bukkit.material.RedstoneTorch;
 import org.bukkit.util.Vector;
 
 import ca.mcpnet.RailDriver.RailDriver.Facing;
@@ -20,8 +21,7 @@ public class RailDriverTask implements Runnable {
 	private boolean shutdown;
 	private World world;
 	private int taskid;
-	
-	int i;
+	int iteration;
 	
 	RailDriverTask(RailDriver instance, Block block) {
 		plugin = instance;
@@ -33,8 +33,7 @@ public class RailDriverTask implements Runnable {
 		shutdown = false;
 		world = block.getWorld();
 		taskid = -1;
-		
-		i = 0;
+		iteration = 0;
 	}
 	
 	Block getRelativeBlock(int i, int j, int k) {
@@ -52,10 +51,39 @@ public class RailDriverTask implements Runnable {
 	}
 
 	public void run() {
-		RailDriver.log.info("Updating Raildriver "+taskid);
-		Block block = getRelativeBlock(2,1,1);
+		// RailDriver.log.info("Updating Raildriver "+taskid);
+		iteration++;
+		// Check that it's still a raildriver
+		/*
+		Block leverblock = world.getBlockAt(x, y, z);
+		if (!plugin.isRailDriver(leverblock)) {
+			RailDriver.log.info("Raildriver corrupted!");
+			plugin.taskset.remove(taskid);
+			deactivate();
+			return;
+		}
+		*/
+		if (iteration % 100 == 1) {
+			Block block = getRelativeBlock(2,1,2);
+			Lever leverblock = new Lever(block.getType(),block.getData());
+			leverblock.setPowered(false);
+			block.setData(leverblock.getData());
+		}
+		if (iteration % 100 == 8) {
+			Block block = getRelativeBlock(2,1,2);
+			Lever leverblock = new Lever(block.getType(),block.getData());
+			leverblock.setPowered(true);
+			block.setData(leverblock.getData());
+		}
+		if (iteration % 100 == 16) {
+			Block block = getRelativeBlock(2,1,2);
+			Lever leverblock = new Lever(block.getType(),block.getData());
+			leverblock.setPowered(false);
+			block.setData(leverblock.getData());
+			iteration = 1;
+		}
 		
-		world.playEffect(block.getLocation(), Effect.STEP_SOUND, block.getTypeId());
+		// world.playEffect(block.getLocation(), Effect.STEP_SOUND, block.getTypeId());
 		/*
 		Block block = this.getRelativeBlock(1, 0, i);
 		i = (i + 1) % 3;
@@ -83,7 +111,7 @@ public class RailDriverTask implements Runnable {
 			RailDriver.log.warning("Activation requested on already active raildriver "+taskid);
 			return;
 		}
-		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 10L);
+		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 2L);
 		RailDriver.log.info("Activated "+direction.name()+ " raildriver "+taskid);
 		// Light the fires
 		RailDriver.log.info(getRelativeBlock(1,0,0).getType().name());
