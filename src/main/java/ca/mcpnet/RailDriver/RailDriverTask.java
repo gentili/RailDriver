@@ -92,17 +92,14 @@ public class RailDriverTask implements Runnable {
 		block.setData(leverblock.getData());
 	}
 	public void run() {
-		iteration++;
-		// Check that it's still a raildriver
-		/*
-		Block leverblock = world.getBlockAt(x, y, z);
-		if (!plugin.isRailDriver(leverblock)) {
-			RailDriver.log.info("Raildriver corrupted!");
-			plugin.taskset.remove(taskid);
-			deactivate();
-			return;
+		if (taskid == -1) {
+			setMainSwitch(false);
+			setDrillSwitch(false);
+			world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
+			plugin.taskset.remove(this);
 		}
-		*/
+
+		iteration++;
 		if (iteration == 1) {
 			setDrillSwitch(false);
 		}
@@ -163,6 +160,16 @@ public class RailDriverTask implements Runnable {
 		}
 		if (iteration == 48) {
 			world.createExplosion(getRelativeBlock(2,1,1).getLocation(), 0);
+			// Check that it's still a raildriver
+			Block leverblock = world.getBlockAt(x, y, z);
+			if (!plugin.isRailDriver(leverblock)) {
+				RailDriver.log.info("Raildriver corrupted!");
+				plugin.taskset.remove(taskid);
+				deactivate();
+				return;
+			}
+			// Now move it!
+			//advance();
 			iteration = 0;
 		}
 		
@@ -176,6 +183,25 @@ public class RailDriverTask implements Runnable {
 		// Light the fires
 	}
 	
+	private void advance() {
+		for (int lx = 0; lx < 3; lx++) {
+			for (int ly = 0; ly < 3; ly++) {
+				for (int lz = RailDriver.raildriverblocklist[lx][ly].length - 1; lz > 0; lz--) {
+					if (RailDriver.raildriverblocklist[lx][ly][lz-1].materials[0] != Material.AIR) {
+						Block target = getRelativeBlock(lz,lx,ly);
+						Block source = getRelativeBlock(lz-1,lx,ly);
+						target.setTypeIdAndData(source.getTypeId(), source.getData(), false);
+						source.setType(Material.AIR);
+					}
+				}
+			}
+		}
+		Location newloc = getRelativeBlock(1,1,1).getLocation();
+		x = newloc.getBlockX();
+		y = newloc.getBlockY();
+		z = newloc.getBlockZ();
+	}
+
 	private void ejectItems() {
 		if (!collecteditems.isEmpty()) {
 			world.createExplosion(getRelativeBlock(6,1,1).getLocation(), 0);
@@ -252,8 +278,7 @@ public class RailDriverTask implements Runnable {
 		RailDriver.log.info("Deactivated raildriver "+taskid);
 		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.FURNACE);
 		setBlockTypeSaveData(getRelativeBlock(1,2,0), Material.FURNACE);
-		setMainSwitch(false);
-		world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
-		plugin.taskset.remove(this);
+		taskid = -1;
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, this, 10L);
 	}
 }
