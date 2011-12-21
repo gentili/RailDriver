@@ -28,7 +28,6 @@ public class RailDriverTask implements Runnable {
 	private World world;
 	private int taskid;
 	int iteration;
-	int distance;
 	boolean nexttorch;
 	ArrayList<ItemStack> collecteditems;
 	Iterator<ItemStack> itemitr;
@@ -45,7 +44,6 @@ public class RailDriverTask implements Runnable {
 		world = block.getWorld();
 		taskid = -1;
 		iteration = 0;
-		distance = 0;
 		nexttorch = false;
 		collecteditems = new ArrayList<ItemStack>();
 		whichdispenser = false;
@@ -255,6 +253,13 @@ public class RailDriverTask implements Runnable {
 			}
 		}
 		int period = 8;
+		int distance;
+		if (direction == BlockFace.NORTH ||
+				direction == BlockFace.SOUTH) {
+			distance = x;
+		} else {
+			distance = z;
+		}
 		if (distance % period == 0) {
 			for (int ly = 0; ly < 3; ly++) {
 				getRelativeBlock(1,-1,ly-1).setTypeId(98);
@@ -289,7 +294,6 @@ public class RailDriverTask implements Runnable {
 		}
 		// plugin.getServer().getScheduler().cancelTask(taskid);
 		// plugin.taskset.remove(this);
-		distance++;
 		Location newloc = getRelativeBlock(1,1,1).getLocation();
 		x = newloc.getBlockX();
 		y = newloc.getBlockY();
