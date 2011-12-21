@@ -12,8 +12,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Attachable;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.RedstoneTorch;
+import org.bukkit.material.Torch;
+
+import ca.mcpnet.RailDriver.RailDriver.Facing;
 
 public class RailDriverTask implements Runnable {
 
@@ -23,7 +28,7 @@ public class RailDriverTask implements Runnable {
 	private World world;
 	private int taskid;
 	int iteration;
-	int nextiteration;
+	int distance;
 	ArrayList<ItemStack> collecteditems;
 	Iterator<ItemStack> itemitr;
 	boolean whichdispenser;
@@ -39,7 +44,7 @@ public class RailDriverTask implements Runnable {
 		world = block.getWorld();
 		taskid = -1;
 		iteration = 0;
-		nextiteration = 1;
+		distance = 0;
 		collecteditems = new ArrayList<ItemStack>();
 		whichdispenser = false;
 		if (direction == BlockFace.EAST) {
@@ -212,15 +217,55 @@ public class RailDriverTask implements Runnable {
 					} else {
 						target.setType(source.getType());
 						target.setData(source.getData());
-						if (lz == 1) {
-							source.setType(Material.AIR);
-						}
 					}
 				}
 			}
 		}
+		// Set the floor made of stone
+		for (int lx = 0; lx < 3; lx++)
+			getRelativeBlock(1,lx,-1).setTypeId(98);
+		for (int lx = 0; lx < 3; lx++) {
+			for (int ly = 0; ly < 3; ly++) {
+				if (!(lx == 1 && ly == 1)) {
+					getRelativeBlock(1,lx,ly).setType(Material.AIR);
+				}
+			}
+		}
+		int period = 4;
+		if (distance % period == 0) { // Time for a left rail
+			Block left = getRelativeBlock(1,0,1);
+			left.setType(Material.REDSTONE_TORCH_ON);
+			Torch lefttorch = new Torch(left.getType(),left.getData());
+			lefttorch.setFacingDirection(Facing.RIGHT.translate(direction));
+			left.setData(lefttorch.getData());
+
+			getRelativeBlock(1,1,0).setType(Material.POWERED_RAIL);
+
+			Block right = getRelativeBlock(1,2,1);
+			right.setType(Material.TORCH);
+			Torch righttorch = new Torch(right.getType(),right.getData());
+			righttorch.setFacingDirection(Facing.LEFT.translate(direction));
+			right.setData(righttorch.getData());
+		} else if (distance % period == period/2) { // Time for right rail
+			Block left = getRelativeBlock(1,0,1);
+			left.setType(Material.TORCH);
+			Torch lefttorch = new Torch(left.getType(),left.getData());
+			lefttorch.setFacingDirection(Facing.RIGHT.translate(direction));
+			left.setData(lefttorch.getData());
+
+			getRelativeBlock(1,1,0).setType(Material.POWERED_RAIL);
+
+			Block right = getRelativeBlock(1,2,1);
+			right.setType(Material.REDSTONE_TORCH_ON);
+			Torch righttorch = new Torch(right.getType(),right.getData());
+			righttorch.setFacingDirection(Facing.LEFT.translate(direction));
+			right.setData(righttorch.getData());
+		} else { // Regular rail
+			getRelativeBlock(1,1,0).setType(Material.RAILS);
+		}
 		// plugin.getServer().getScheduler().cancelTask(taskid);
 		// plugin.taskset.remove(this);
+		distance++;
 		Location newloc = getRelativeBlock(1,1,1).getLocation();
 		x = newloc.getBlockX();
 		y = newloc.getBlockY();
