@@ -12,10 +12,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Attachable;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.RedstoneTorch;
 import org.bukkit.material.Torch;
 
 import ca.mcpnet.RailDriver.RailDriver.Facing;
@@ -172,6 +170,7 @@ public class RailDriverTask implements Runnable {
 				deactivate();
 				return;
 			}
+			// RailDriver.log.info("RailDriver "+taskid+" in chunk "+world.getChunkAt(getRelativeBlock(0,1,1)));
 			world.createExplosion(getRelativeBlock(2,1,1).getLocation(), 0);
 			iteration = 0;
 		}
@@ -357,7 +356,7 @@ public class RailDriverTask implements Runnable {
 			return;
 		}
 		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 2L);
-		RailDriver.log.info("Activated "+direction.name()+ " raildriver "+taskid);
+		RailDriver.log.info("Activated "+direction.name()+ "BOUND raildriver "+taskid);
 		// Light the fires
 
 		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.BURNING_FURNACE);

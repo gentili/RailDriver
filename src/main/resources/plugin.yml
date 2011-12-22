@@ -5,7 +5,7 @@ commands:
    rd_stock:
       description: stock the player inventory with all required blocks for building a raildriver
       permission: <plugin name>.rd_stock
-      usage: <command>
+      usage: <command> [player]
    rd_devkit:
       description: stock the player inventory with a developers kit of tools
       permission: <plugin name>.rd_devkit

@@ -27,7 +27,7 @@ public class RailDriver extends JavaPlugin {
 
 	static Logger log = Logger.getLogger("Minecraft");
 	PluginManager pm;
-	private final RailDriverPlayerListener playerListener = new RailDriverPlayerListener(
+	private final RailDriverWorldListener worldListener = new RailDriverWorldListener(
 			this);
 	private final RailDriverBlockListener blockListener = new RailDriverBlockListener(
 			this);
@@ -333,7 +333,7 @@ public class RailDriver extends JavaPlugin {
 		// log.info("RailDriver Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
+		// pm.registerEvent(Event.Type.CHUNK_LOAD, worldListener, Event.Priority.Normal, this);
 	}
 
 	public void onDisable() {
@@ -394,9 +394,9 @@ public class RailDriver extends JavaPlugin {
 				sender.sendMessage("Must specify player when calling from server console!");
 				return false;
 			}
-			sender.sendMessage("DevKit applied!");
+			sender.sendMessage("DevKit applied");
 			if (sender != player) {
-				player.sendMessage("DevKit applied!");
+				player.sendMessage("DevKit applied");
 			}
 			PlayerInventory inventory = player.getInventory();
 			for (int i = 0; i < devkit.length; i++) {
@@ -410,22 +410,35 @@ public class RailDriver extends JavaPlugin {
 		
 		// Stock the player with materials required to build a raildriver
 		if (cmd.getName().equalsIgnoreCase("rd_stock")) {
-			// FIXME Should be able to stock a specific player
-			if (player == null) {
-				sender.sendMessage("Not a server console command!");
+			if (args.length > 1) {
+				sender.sendMessage("Too many arguments!");
 				return false;
-			} else {
-				sender.sendMessage("Yeah! Stock that fucker up!");
-				PlayerInventory pi = player.getInventory();
-				pi.addItem(new ItemStack(29,64)); // 29 sticky piston
-				pi.addItem(new ItemStack(42,64)); // 42 iron block
-				// 76 redstone torch
-				pi.addItem(new ItemStack(331,64)); // 331 redstone
-				pi.addItem(new ItemStack(69,64)); // 69 lever
-				pi.addItem(new ItemStack(61,64)); // 61 furnace
-				pi.addItem(new ItemStack(23,64)); // 23 dispencer
-				pi.addItem(new ItemStack(57,64)); // 57 block of diamond
 			}
+			if (args.length == 1) {
+				player = getServer().getPlayer(args[0]);
+				if (player == null) {
+					sender.sendMessage("Player not found!");
+					return false;
+				}
+			}
+			if (player == null) {
+				sender.sendMessage("Must specify player when calling from server console!");
+				return false;
+			}
+			sender.sendMessage("Inventory stocked with RailDriver parts");
+			if (sender != player) {
+				player.sendMessage("Inventory stocked with RailDriver parts");
+			}
+			PlayerInventory pi = player.getInventory();
+			pi.addItem(new ItemStack(29,9)); // 29 sticky piston
+			pi.addItem(new ItemStack(42,19)); // 42 iron block
+			pi.addItem(new ItemStack(331,2)); // 331 redstone
+			pi.addItem(new ItemStack(69,2)); // 69 lever
+			pi.addItem(new ItemStack(61,2)); // 61 furnace
+			pi.addItem(new ItemStack(23,2)); // 23 dispencer
+			pi.addItem(new ItemStack(57,9)); // 57 block of diamond
+			pi.addItem(new ItemStack(Material.DIODE,4));
+			pi.addItem(new ItemStack(Material.CHEST,1));
 			return true;
 		}
 		return false;
