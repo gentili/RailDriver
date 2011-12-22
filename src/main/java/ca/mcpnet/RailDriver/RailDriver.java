@@ -25,7 +25,11 @@ import org.bukkit.util.Vector;
 
 public class RailDriver extends JavaPlugin {
 
-	static Logger log = Logger.getLogger("Minecraft");
+	static Logger logger = Logger.getLogger("Minecraft");
+	static public void log(String msg) {
+		logger.info("[RailDriver] "+msg);
+	}
+	
 	PluginManager pm;
 	private final RailDriverWorldListener worldListener = new RailDriverWorldListener(
 			this);
@@ -330,14 +334,14 @@ public class RailDriver extends JavaPlugin {
 	// Bukkit Callbacks
 	
 	public void onEnable() {
-		log.info("RailDriver Plugin Enabled!");
+		log("RailDriver Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Event.Priority.Normal, this);
 		// pm.registerEvent(Event.Type.CHUNK_LOAD, worldListener, Event.Priority.Normal, this);
 	}
 
 	public void onDisable() {
-		log.info("RailDriver Plugin Disabled!");
+		log("RailDriver Plugin Disabled!");
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,

@@ -11,6 +11,6 @@ public class RailDriverWorldListener extends WorldListener {
 	}
 	@Override
 	public void onChunkLoad(ChunkLoadEvent event) {
-		RailDriver.log.info(event.getEventName()+":"+event.getChunk());
+		RailDriver.log(event.getEventName()+":"+event.getChunk());
 	}	
 }

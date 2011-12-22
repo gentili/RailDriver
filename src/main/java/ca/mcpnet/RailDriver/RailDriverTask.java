@@ -104,14 +104,14 @@ public class RailDriverTask implements Runnable {
 		if (iteration == 6) {
 			Block leverblock = world.getBlockAt(x, y, z);
 			if (!plugin.isRailDriver(leverblock)) {
-				RailDriver.log.info("Raildriver malfunction during drill phase!");
+				RailDriver.log("Raildriver malfunction during drill phase!");
 				plugin.taskset.remove(taskid);
 				deactivate();
 				return;
 			}
 			// Remove materials in front of bit
 			if (!excavate()) {
-				RailDriver.log.info("Raildriver encountered obstruction!");
+				RailDriver.log("Raildriver encountered obstruction!");
 				deactivate();
 				return;
 			}
@@ -167,13 +167,13 @@ public class RailDriverTask implements Runnable {
 			// Check that it's still a raildriver
 			Block leverblock = world.getBlockAt(x, y, z);
 			if (!plugin.isRailDriver(leverblock)) {
-				RailDriver.log.info("Raildriver malfunction during advance phase!");
+				RailDriver.log("Raildriver malfunction during advance phase!");
 				plugin.taskset.remove(taskid);
 				deactivate();
 				return;
 			}
 			if (!advance()) {
-				RailDriver.log.info("Raildriver encountered unstable environment!");
+				RailDriver.log("Raildriver encountered unstable environment!");
 				deactivate();
 				return;
 			}
@@ -359,11 +359,11 @@ public class RailDriverTask implements Runnable {
 	}
 	public void activate() {
 		if (taskid != -1) {
-			RailDriver.log.warning("Activation requested on already active raildriver "+taskid);
+			RailDriver.log("Activation requested on already active raildriver "+taskid);
 			return;
 		}
 		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 2L);
-		RailDriver.log.info("Activated "+direction.name()+ "BOUND raildriver "+taskid);
+		RailDriver.log("Activated "+direction.name()+ "BOUND raildriver "+taskid);
 		// Light the fires
 
 		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.BURNING_FURNACE);
@@ -376,11 +376,11 @@ public class RailDriverTask implements Runnable {
 	
 	public void deactivate() {
 		if (taskid == -1) {
-			RailDriver.log.warning("Deactivation requested for already inactive raildriver!");
+			RailDriver.log("Deactivation requested for already inactive raildriver!");
 			return;
 		}
 		plugin.getServer().getScheduler().cancelTask(taskid);
-		RailDriver.log.info("Deactivated raildriver "+taskid);
+		RailDriver.log("Deactivated raildriver "+taskid);
 		// Shut off furnaces
 		Block leftblock = getRelativeBlock(1,0,0);
 		if (leftblock.getType() == Material.BURNING_FURNACE)
