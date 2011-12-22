@@ -102,9 +102,16 @@ public class RailDriverTask implements Runnable {
 			setDrillSwitch(false);
 		}
 		if (iteration == 6) {
+			Block leverblock = world.getBlockAt(x, y, z);
+			if (!plugin.isRailDriver(leverblock)) {
+				RailDriver.log.info("Raildriver malfunction during drill phase!");
+				plugin.taskset.remove(taskid);
+				deactivate();
+				return;
+			}
 			// Remove materials in front of bit
 			if (!excavate()) {
-				RailDriver.log.info("Obstruction encountered!");
+				RailDriver.log.info("Raildriver encountered obstruction!");
 				deactivate();
 				return;
 			}
@@ -160,13 +167,13 @@ public class RailDriverTask implements Runnable {
 			// Check that it's still a raildriver
 			Block leverblock = world.getBlockAt(x, y, z);
 			if (!plugin.isRailDriver(leverblock)) {
-				RailDriver.log.info("Raildriver corrupted!");
+				RailDriver.log.info("Raildriver malfunction during advance phase!");
 				plugin.taskset.remove(taskid);
 				deactivate();
 				return;
 			}
 			if (!advance()) {
-				RailDriver.log.info("Unstable environment encountered!");
+				RailDriver.log.info("Raildriver encountered unstable environment!");
 				deactivate();
 				return;
 			}
@@ -374,8 +381,14 @@ public class RailDriverTask implements Runnable {
 		}
 		plugin.getServer().getScheduler().cancelTask(taskid);
 		RailDriver.log.info("Deactivated raildriver "+taskid);
-		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.FURNACE);
-		setBlockTypeSaveData(getRelativeBlock(1,2,0), Material.FURNACE);
+		// Shut off furnaces
+		Block leftblock = getRelativeBlock(1,0,0);
+		if (leftblock.getType() == Material.BURNING_FURNACE)
+			setBlockTypeSaveData(leftblock, Material.FURNACE);
+		Block rightblock = getRelativeBlock(1,2,0);
+		if (rightblock.getType() == Material.BURNING_FURNACE)
+			setBlockTypeSaveData(rightblock, Material.FURNACE);
+		// Shutdown hiss
 		world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
 		taskid = -1;
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, this, 10L);

@@ -330,7 +330,7 @@ public class RailDriver extends JavaPlugin {
 	// Bukkit Callbacks
 	
 	public void onEnable() {
-		// log.info("RailDriver Plugin Enabled!");
+		log.info("RailDriver Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Event.Priority.Normal, this);
 		// pm.registerEvent(Event.Type.CHUNK_LOAD, worldListener, Event.Priority.Normal, this);
