@@ -351,35 +351,6 @@ public class RailDriver extends JavaPlugin {
 			player = (Player) sender;
 		}
 
-		// carve out a cavern from the players location outwards
-		if (cmd.getName().equals("rd_cavern")) {
-			if (args.length > 2) {
-				sender.sendMessage("Too many arguments!");
-				return false;
-			}
-			if (args.length == 2) {
-				player = getServer().getPlayer(args[1]);
-				if (player == null) {
-					sender.sendMessage("Player not found!");
-					return false;
-				}
-			}
-			if (player == null) {
-				sender.sendMessage("Must specify player when calling from server console!");
-				return false;
-			}
-			int radius = 0;
-			try {
-				radius = Integer.decode(args[0]);
-			} catch (NumberFormatException e) {
-				sender.sendMessage("Must specify the size of the cavern");
-				return false;
-			}
-			CavernCarverTask task = new CavernCarverTask(this, sender, player, player.getLocation(), radius);
-			task.setTaskid(getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 10L, 2L));
-			sender.sendMessage("Scheduled cavern carver job "+task.getTaskid()+", radius "+ radius);
-			return true;
-		}
 		
 		// Stock the player with things useful for a developer of this plugin
 		if (cmd.getName().equals("rd_devkit")) {

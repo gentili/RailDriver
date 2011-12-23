@@ -7,7 +7,7 @@
   <packaging>jar</packaging>
 
   <name>RailDriver</name>
-  <url>http://mcpnet.ca/RailDriver</url>
+  <url>http://bluesmoke.ca/RailDriver</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
