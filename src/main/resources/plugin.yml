@@ -1,12 +1,20 @@
 name: RailDriver
 main: ca.mcpnet.RailDriver.RailDriver
-version: 0.0.1
+version: 0.1
+author: globnobulous
 commands:
    rd_stock:
       description: stock the player inventory with all required blocks for building a raildriver
-      permission: <plugin name>.rd_stock
+      permission: RailDriver.rd_stock
       usage: /<command> [player]
    rd_devkit:
       description: stock the player inventory with a developers kit of tools
-      permission: <plugin name>.rd_devkit
+      permission: RailDriver.rd_devkit
       usage: /<command> [player]
+permissions:
+   RailDriver.rd_stock:
+      description: allows player to execute the rd_stock command
+      default: op
+   RailDriver.rd_devkit:
+      description: allows player to execute the rd_devkit command
+      default: op

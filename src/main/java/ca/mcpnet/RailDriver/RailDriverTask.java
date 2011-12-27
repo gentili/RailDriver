@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.block.Furnace;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
@@ -232,9 +233,23 @@ public class RailDriverTask implements Runnable {
 						Inventory targetinventory = targetchest.getInventory();
 						targetinventory.setContents(sourceitems);
 						targetchest.update();
+					} else if (source.getType() == Material.BURNING_FURNACE) {
+						Furnace sourcefurnace = (Furnace) source.getState();
+						Inventory sourceinventory = sourcefurnace.getInventory();
+						ItemStack[] sourceitems = sourceinventory.getContents();
+						sourceinventory.clear();
+						MaterialData sourcedata = sourcefurnace.getData();
+						// Blow the old chest away
+						source.setType(Material.AIR);
+						
+						target.setType(Material.BURNING_FURNACE);
+						Furnace targetfurnace = (Furnace) target.getState();
+						targetfurnace.setData(sourcedata);
+						Inventory targetinventory = targetfurnace.getInventory();
+						targetinventory.setContents(sourceitems);
+						targetfurnace.update();
 					} else if (source.getType() == Material.DISPENSER || 
 							source.getType() == Material.FURNACE ||
-							source.getType() == Material.BURNING_FURNACE || 
 							source.getType() == Material.LEVER) {
 						byte sourcedata = source.getData();
 						Material sourcematerial = source.getType();
@@ -357,6 +372,29 @@ public class RailDriverTask implements Runnable {
 		block.setType(type);
 		block.setData(data);		
 	}
+	public void setFurnaceBurning(Block block, boolean on) {
+		if (block.getType() != Material.BURNING_FURNACE &&
+				block.getType()  != Material.FURNACE) {
+			return;
+		}
+		Furnace furnace = (Furnace) block.getState();
+		Inventory inventory = furnace.getInventory();
+		ItemStack[] contents = inventory.getContents();
+		inventory.clear();
+		MaterialData data = furnace.getData();
+
+		if (on) {
+			block.setType(Material.BURNING_FURNACE);
+		} else {
+			block.setType(Material.FURNACE);
+		}
+		furnace = (Furnace) block.getState();
+		furnace.setData(data);
+		inventory = furnace.getInventory();
+		inventory.setContents(contents);
+		furnace.update();
+
+	}
 	public void activate() {
 		if (taskid != -1) {
 			RailDriver.log("Activation requested on already active raildriver "+taskid);
@@ -365,10 +403,8 @@ public class RailDriverTask implements Runnable {
 		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 2L);
 		RailDriver.log("Activated "+direction.name()+ "BOUND raildriver "+taskid);
 		// Light the fires
-
-		setBlockTypeSaveData(getRelativeBlock(1,0,0), Material.BURNING_FURNACE);
-		setBlockTypeSaveData(getRelativeBlock(1,2,0), Material.BURNING_FURNACE);
-		
+		setFurnaceBurning(getRelativeBlock(1,0,0),true);
+		setFurnaceBurning(getRelativeBlock(1,2,0),true);
 		// Furnace furnace = (Furnace) getRelativeBlock(1,0,0).getState();
 		// furnace.setType(Material.BURNING_FURNACE);
 		// furnace.update();
@@ -382,12 +418,8 @@ public class RailDriverTask implements Runnable {
 		plugin.getServer().getScheduler().cancelTask(taskid);
 		RailDriver.log("Deactivated raildriver "+taskid);
 		// Shut off furnaces
-		Block leftblock = getRelativeBlock(1,0,0);
-		if (leftblock.getType() == Material.BURNING_FURNACE)
-			setBlockTypeSaveData(leftblock, Material.FURNACE);
-		Block rightblock = getRelativeBlock(1,2,0);
-		if (rightblock.getType() == Material.BURNING_FURNACE)
-			setBlockTypeSaveData(rightblock, Material.FURNACE);
+		setFurnaceBurning(getRelativeBlock(1,0,0),false);
+		setFurnaceBurning(getRelativeBlock(1,2,0),false);
 		// Shutdown hiss
 		world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
 		taskid = -1;
