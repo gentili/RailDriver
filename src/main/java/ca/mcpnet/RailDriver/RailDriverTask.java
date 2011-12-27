@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Furnace;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
@@ -101,6 +102,14 @@ public class RailDriverTask implements Runnable {
 		iteration++;
 		if (iteration == 1) {
 			setDrillSwitch(false);
+			if (plugin.getConfig().getBoolean("requires_fuel")) {
+				if (!burnCoal()) {
+					RailDriver.log("Raildriver has insufficient fuel!");
+					plugin.taskset.remove(taskid);
+					deactivate();
+				}
+				
+			}
 		}
 		if (iteration == 6) {
 			Block leverblock = world.getBlockAt(x, y, z);
@@ -193,6 +202,22 @@ public class RailDriverTask implements Runnable {
 		// Light the fires
 	}
 	
+	private boolean burnCoal() {
+		Block leftblock = getRelativeBlock(1,0,0);
+		Furnace leftfurnace = (Furnace) leftblock.getState();
+		Inventory leftinventory = leftfurnace.getInventory();
+		Block rightblock = getRelativeBlock(1,2,0);
+		Furnace rightfurnace = (Furnace) rightblock.getState();
+		Inventory rightinventory = rightfurnace.getInventory();
+		if (!leftinventory.contains(Material.COAL) || 
+				(!rightinventory.contains(Material.COAL))) {
+			return false;
+		}
+		leftinventory.removeItem(new ItemStack(Material.COAL,1));
+		rightinventory.removeItem(new ItemStack(Material.COAL,1));
+		return true;
+	}
+
 	private boolean advance() {
 		// Check to make sure ground under is solid
 		for (int lx = 0; lx < 3; lx++) {
@@ -405,9 +430,6 @@ public class RailDriverTask implements Runnable {
 		// Light the fires
 		setFurnaceBurning(getRelativeBlock(1,0,0),true);
 		setFurnaceBurning(getRelativeBlock(1,2,0),true);
-		// Furnace furnace = (Furnace) getRelativeBlock(1,0,0).getState();
-		// furnace.setType(Material.BURNING_FURNACE);
-		// furnace.update();
 	}
 	
 	public void deactivate() {
