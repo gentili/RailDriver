@@ -213,8 +213,10 @@ public class RailDriverTask implements Runnable {
 				(!rightinventory.contains(Material.COAL))) {
 			return false;
 		}
-		leftinventory.removeItem(new ItemStack(Material.COAL,1));
-		rightinventory.removeItem(new ItemStack(Material.COAL,1));
+		leftinventory.removeItem(new ItemStack(Material.COAL.getId(),1,(short)0,(byte)1),new ItemStack(Material.COAL,1));
+		rightinventory.removeItem(new ItemStack(Material.COAL.getId(),1,(short)0,(byte)1),new ItemStack(Material.COAL,1));
+		leftfurnace.update();
+		rightfurnace.update();
 		return true;
 	}
 
