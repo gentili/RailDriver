@@ -12,7 +12,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Furnace;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -185,7 +184,6 @@ public class RailDriverTask implements Runnable {
 				return;
 			}
 			if (!advance()) {
-				localbroadcast("Raildriver encountered unstable environment!");
 				deactivate();
 				return;
 			}
@@ -241,18 +239,60 @@ public class RailDriverTask implements Runnable {
 			for (int lz = 0; lz < RailDriver.raildriverblocklist[lx][0].length; lz++) {
 				Block block = getRelativeBlock(lz,lx,-1);
 				if (block.isEmpty() || block.isLiquid()) {
+					localbroadcast("Raildriver encountered broken ground!");
 					return false;
 				}
 			}
 		}
-		// Check to make sure behind has no liquidw 
+		// Check to make sure behind has no liquid
 		for (int lx = 0; lx < 3; lx++) {
 			Block block = getRelativeBlock(0,lx,0);
 			if (block.isLiquid()) {
+				localbroadcast("Raildriver encountered unstable environment!");
 				return false;
 			}			
 		}
-		
+		// Check to make sure raildriver has enough materials
+		int period = 8;
+		int distance;
+		if (direction == BlockFace.NORTH ||
+				direction == BlockFace.SOUTH) {
+			distance = x;
+		} else {
+			distance = z;
+		}
+		if (plugin.getConfig().getBoolean("requires_fuel")) {
+			Chest chest = (Chest) getRelativeBlock(1,1,2).getState();
+			Inventory inventory = chest.getInventory();
+			boolean torchcolumns = distance % period == 0;
+			if (torchcolumns) {
+				if (!inventory.contains(Material.GOLD_INGOT, 2) ||
+						!inventory.contains(Material.STICK,3) || 
+						!inventory.contains(Material.COBBLESTONE, 9) ||
+						!inventory.contains(Material.REDSTONE, 2) ||
+						!inventory.contains(Material.COAL,1)) {
+					localbroadcast("Raildriver has insufficient building materials for power columns!");
+					return false;				
+				}
+				inventory.removeItem(
+						new ItemStack(Material.GOLD_INGOT,2),
+						new ItemStack(Material.STICK,3),
+						new ItemStack(Material.COBBLESTONE,9),
+						new ItemStack(Material.REDSTONE,2),
+						new ItemStack(Material.COAL,1));					
+			} else {
+				if (!inventory.contains(Material.IRON_INGOT, 2) ||
+						!inventory.contains(Material.STICK,1) || 
+						!inventory.contains(Material.COBBLESTONE, 3)) {
+					localbroadcast("Raildriver has insufficient building materials!");
+					return false;				
+				}
+				inventory.removeItem(
+						new ItemStack(Material.IRON_INGOT,2),
+						new ItemStack(Material.STICK,1),
+						new ItemStack(Material.COBBLESTONE,3));					
+			}
+		}
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				for (int lz = RailDriver.raildriverblocklist[lx][ly].length; lz > 0; lz--) {
@@ -319,14 +359,6 @@ public class RailDriverTask implements Runnable {
 					getRelativeBlock(1,lx,ly).setType(Material.AIR);
 				}
 			}
-		}
-		int period = 8;
-		int distance;
-		if (direction == BlockFace.NORTH ||
-				direction == BlockFace.SOUTH) {
-			distance = x;
-		} else {
-			distance = z;
 		}
 		if (distance % period == 0) {
 			for (int ly = 0; ly < 3; ly++) {
