@@ -2,6 +2,7 @@ package ca.mcpnet.RailDriver;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -12,6 +13,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Furnace;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
@@ -104,7 +106,7 @@ public class RailDriverTask implements Runnable {
 			setDrillSwitch(false);
 			if (plugin.getConfig().getBoolean("requires_fuel")) {
 				if (!burnCoal()) {
-					RailDriver.log("Raildriver has insufficient fuel!");
+					localbroadcast("Raildriver has insufficient fuel!");
 					plugin.taskset.remove(taskid);
 					deactivate();
 				}
@@ -114,14 +116,14 @@ public class RailDriverTask implements Runnable {
 		if (iteration == 6) {
 			Block leverblock = world.getBlockAt(x, y, z);
 			if (!plugin.isRailDriver(leverblock)) {
-				RailDriver.log("Raildriver malfunction during drill phase!");
+				localbroadcast("Raildriver malfunction during drill phase!");
 				plugin.taskset.remove(taskid);
 				deactivate();
 				return;
 			}
 			// Remove materials in front of bit
 			if (!excavate()) {
-				RailDriver.log("Raildriver encountered obstruction!");
+				localbroadcast("Raildriver encountered obstruction!");
 				deactivate();
 				return;
 			}
@@ -177,13 +179,13 @@ public class RailDriverTask implements Runnable {
 			// Check that it's still a raildriver
 			Block leverblock = world.getBlockAt(x, y, z);
 			if (!plugin.isRailDriver(leverblock)) {
-				RailDriver.log("Raildriver malfunction during advance phase!");
+				localbroadcast("Raildriver malfunction during advance phase!");
 				plugin.taskset.remove(taskid);
 				deactivate();
 				return;
 			}
 			if (!advance()) {
-				RailDriver.log("Raildriver encountered unstable environment!");
+				localbroadcast("Raildriver encountered unstable environment!");
 				deactivate();
 				return;
 			}
@@ -202,6 +204,19 @@ public class RailDriverTask implements Runnable {
 		// Light the fires
 	}
 	
+	private void localbroadcast(String msg) {
+		Block block = getRelativeBlock(0,0,0);
+		Location location = block.getLocation();
+		List<Player> players = block.getWorld().getPlayers(); 
+		Iterator<Player> pitr = players.iterator();
+		while (pitr.hasNext()) {
+			Player player = pitr.next();
+			if (location.distanceSquared(player.getLocation()) < 36) {
+				player.sendMessage(msg);
+			}
+		}
+	}
+
 	private boolean burnCoal() {
 		Block leftblock = getRelativeBlock(1,0,0);
 		Furnace leftfurnace = (Furnace) leftblock.getState();
