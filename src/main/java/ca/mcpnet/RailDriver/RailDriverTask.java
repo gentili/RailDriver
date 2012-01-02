@@ -230,7 +230,7 @@ public class RailDriverTask implements Runnable {
 				}
 			}
 		}
-		// Check to make sure behind has no liquid
+		// Check to make sure behind has no liquidw 
 		for (int lx = 0; lx < 3; lx++) {
 			Block block = getRelativeBlock(0,lx,0);
 			if (block.isLiquid()) {
@@ -283,6 +283,11 @@ public class RailDriverTask implements Runnable {
 						source.setType(Material.AIR);
 						target.setType(sourcematerial);
 						target.setData(sourcedata);
+					} else if (source.getType() == Material.TORCH ||
+							source.getType() == Material.REDSTONE_TORCH_ON ||
+							source.getType() == Material.REDSTONE_TORCH_OFF) {
+						// Prevent free torch dropping side effect
+						target.setType(Material.AIR);						
 					} else {
 						target.setType(source.getType());
 						target.setData(source.getData());
