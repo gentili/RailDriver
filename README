@@ -1,1 +1,30 @@
-This is the RailDriver plugin for Bukkit.
+== CavernCarver ==
+{{http://dev.bukkit.org/media/images/36/845/CavernCarver.PNG|Caverns}}
+This plugin provides a player with the ability to make a cavern of user specified radius carve itself while the player watches from within!  Ore blocks drop expected items.
+
+== Installation ==
+Download the jar [[http://dev.bukkit.org/media/files/563/713/CavernCarver-0.2.jar|here]].  Drop it in your plugins directory and go!
+
+== Configuration ==
+Standard config.yml in the CavernCarver directory.  Default maximum radius set to 15.  Changes with **/cc_maxradius** are persisted here.
+
+== Commands ==
+<<code yaml>>
+   cc_cavern:
+      description: carve out a cavern from where the player is standing
+      permission: caverncarver.cc_cavern
+      usage: /cc_cavern size [player]
+   cc_maxradius:
+      description: set the maximum allowable radius for cavern carving
+      permission: caverncarver.cc_maxradius
+      usage: /cc_maxradius radius
+<</code>>
+== Permissions ==
+<<code yaml>>
+   caverncarver.cc_cavern:
+      description: allows player to execute the cc_cavern command
+      default: op
+   caverncarver.cc_maxradius:
+      description: allows player to execute the cc_maxradius command
+      default: op
+<</code>>
