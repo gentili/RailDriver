@@ -281,16 +281,25 @@ public class RailDriverTask implements Runnable {
 						new ItemStack(Material.REDSTONE,2),
 						new ItemStack(Material.COAL,1));					
 			} else {
-				if (!inventory.contains(Material.IRON_INGOT, 2) ||
-						!inventory.contains(Material.STICK,1) || 
-						!inventory.contains(Material.COBBLESTONE, 3)) {
+				// Try to use actual rails in inventory
+				if (inventory.contains(Material.RAILS, 1) &&
+						inventory.contains(Material.COBBLESTONE, 3)) {
+					inventory.removeItem(
+							new ItemStack(Material.RAILS,1),
+							new ItemStack(Material.COBBLESTONE,3));
+				} else 
+					// Try iron ingots and stick
+					if (inventory.contains(Material.IRON_INGOT, 2) &&
+							inventory.contains(Material.STICK,1) && 
+							inventory.contains(Material.COBBLESTONE, 3)) {
+						inventory.removeItem(
+								new ItemStack(Material.IRON_INGOT,2),
+								new ItemStack(Material.STICK,1),
+								new ItemStack(Material.COBBLESTONE,3));					
+				} else {
 					localbroadcast("Raildriver has insufficient building materials!");
-					return false;				
+					return false;
 				}
-				inventory.removeItem(
-						new ItemStack(Material.IRON_INGOT,2),
-						new ItemStack(Material.STICK,1),
-						new ItemStack(Material.COBBLESTONE,3));					
 			}
 		}
 		for (int lx = 0; lx < 3; lx++) {
