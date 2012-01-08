@@ -266,40 +266,56 @@ public class RailDriverTask implements Runnable {
 			Inventory inventory = chest.getInventory();
 			boolean torchcolumns = distance % period == 0;
 			if (torchcolumns) {
-				if (!inventory.contains(Material.GOLD_INGOT, 2) ||
-						!inventory.contains(Material.STICK,3) || 
+				if (!inventory.contains(Material.POWERED_RAIL,1)) {
+					// If we don't have powered rails, we try and convert other materials
+					if (!inventory.contains(Material.GOLD_INGOT,4) ||
+							!inventory.contains(Material.STICK,1) ||
+							!inventory.contains(Material.REDSTONE,1)) {
+						localbroadcast("Raildriver has insufficient building materials for power rails!");
+						return false;
+					}
+					inventory.removeItem(
+							new ItemStack(Material.GOLD_INGOT,4),
+							new ItemStack(Material.STICK,1),
+							new ItemStack(Material.REDSTONE,1));
+					inventory.addItem(new ItemStack(Material.POWERED_RAIL,14));
+				}
+				if (!inventory.contains(Material.POWERED_RAIL, 1) ||
 						!inventory.contains(Material.COBBLESTONE, 9) ||
-						!inventory.contains(Material.REDSTONE, 2) ||
+						!inventory.contains(Material.STICK, 2) ||
+						!inventory.contains(Material.REDSTONE, 1) ||
 						!inventory.contains(Material.COAL,1)) {
 					localbroadcast("Raildriver has insufficient building materials for power columns!");
 					return false;				
 				}
 				inventory.removeItem(
-						new ItemStack(Material.GOLD_INGOT,2),
-						new ItemStack(Material.STICK,3),
+						new ItemStack(Material.POWERED_RAIL,1),
 						new ItemStack(Material.COBBLESTONE,9),
-						new ItemStack(Material.REDSTONE,2),
+						new ItemStack(Material.STICK,2),
+						new ItemStack(Material.REDSTONE,1),
 						new ItemStack(Material.COAL,1));					
 			} else {
-				// Try to use actual rails in inventory
-				if (inventory.contains(Material.RAILS, 1) &&
-						inventory.contains(Material.COBBLESTONE, 3)) {
+				if (!inventory.contains(Material.RAILS, 1)) {
+					// If we don't have rails, we try and convert other materials
+					if (!inventory.contains(Material.IRON_INGOT,4) ||
+							!inventory.contains(Material.STICK,1)) {
+						localbroadcast("Raildriver has insufficient building materials for rails!");
+						return false;
+					}
 					inventory.removeItem(
-							new ItemStack(Material.RAILS,1),
-							new ItemStack(Material.COBBLESTONE,3));
-				} else 
-					// Try iron ingots and stick
-					if (inventory.contains(Material.IRON_INGOT, 2) &&
-							inventory.contains(Material.STICK,1) && 
-							inventory.contains(Material.COBBLESTONE, 3)) {
-						inventory.removeItem(
-								new ItemStack(Material.IRON_INGOT,2),
-								new ItemStack(Material.STICK,1),
-								new ItemStack(Material.COBBLESTONE,3));					
-				} else {
-					localbroadcast("Raildriver has insufficient building materials!");
+							new ItemStack(Material.IRON_INGOT,4),
+							new ItemStack(Material.STICK,1));
+					inventory.addItem(new ItemStack(Material.RAILS,14));
+				}
+				// Now try to lay the track
+				if (!inventory.contains(Material.RAILS, 1) ||
+						!inventory.contains(Material.COBBLESTONE, 3)) {
+					localbroadcast("Raildriver has insufficient building materials for rails!");
 					return false;
 				}
+				inventory.removeItem(
+						new ItemStack(Material.RAILS,1),
+						new ItemStack(Material.COBBLESTONE,3));					
 			}
 		}
 		for (int lx = 0; lx < 3; lx++) {
