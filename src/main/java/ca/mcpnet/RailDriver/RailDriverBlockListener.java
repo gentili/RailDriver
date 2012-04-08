@@ -1,10 +1,12 @@
 package ca.mcpnet.RailDriver;
 
 import org.bukkit.Material;
-import org.bukkit.event.block.BlockListener;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
-public class RailDriverBlockListener extends BlockListener {
+public class RailDriverBlockListener implements Listener {
 
 	private RailDriver plugin;
 
@@ -12,7 +14,7 @@ public class RailDriverBlockListener extends BlockListener {
 		plugin = instance;
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockRedstoneChange(BlockRedstoneEvent event) {
 		if (event.getBlock().getType() == Material.LEVER) {
 			if (event.getOldCurrent() > event.getNewCurrent()) {

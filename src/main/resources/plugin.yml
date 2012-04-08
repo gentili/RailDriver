@@ -1,6 +1,6 @@
 name: RailDriver
 main: ca.mcpnet.RailDriver.RailDriver
-version: 0.1
+version: 0.2
 author: globnobulous
 commands:
    rd_stock:

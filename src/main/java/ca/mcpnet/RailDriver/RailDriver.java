@@ -10,7 +10,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Diode;
@@ -25,17 +24,13 @@ import org.bukkit.util.Vector;
 
 public class RailDriver extends JavaPlugin {
 
-	static public final String VERSION = "0.1";
+	static public final String VERSION = "0.2";
 	static Logger logger = Logger.getLogger("Minecraft");
 	static public void log(String msg) {
 		logger.info("[RailDriver] "+msg);
 	}
 	
 	PluginManager pm;
-	private final RailDriverWorldListener worldListener = new RailDriverWorldListener(
-			this);
-	private final RailDriverBlockListener blockListener = new RailDriverBlockListener(
-			this);
 
 	private final ItemStack[] devkit = {
 			new ItemStack(Material.DIAMOND_PICKAXE, 1),
@@ -333,12 +328,15 @@ public class RailDriver extends JavaPlugin {
 	}
 
 	// Bukkit Callbacks
-	
 	public void onEnable() {
 		log("RailDriver v"+VERSION+" Plugin Enabled!");
 		pm = getServer().getPluginManager();
-		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Event.Priority.Normal, this);
-		// pm.registerEvent(Event.Type.CHUNK_LOAD, worldListener, Event.Priority.Normal, this);
+		
+		pm.registerEvents(new RailDriverBlockListener(this), this);
+		
+		// World listener just logs atm, so commenting out for release
+		//pm.registerEvents(new RailDriverWorldListener(this), this);
+		
 		getConfig().options().copyDefaults(true);
 		getConfig().options().copyHeader(true);
 		saveConfig();
