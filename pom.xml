@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ca.mcpnet</groupId>
   <artifactId>RailDriver</artifactId>
-  <version>0.1</version>
+  <version>0.2</version>
   <packaging>jar</packaging>
 
   <name>RailDriver</name>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.0.1-R2-SNAPSHOT</version>
+      <version>1.2.4-R1.0</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
