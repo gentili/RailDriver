@@ -391,10 +391,12 @@ public class RailDriverTask implements Runnable {
 				getRelativeBlock(1,3,ly-1).setTypeId(98);
 			}
 			
-			Block left = getRelativeBlock(1,0,1);
+			Block left;
 			if (nexttorch) {
+				left = getRelativeBlock(1,0,0);
 				left.setType(Material.REDSTONE_TORCH_ON);
 			} else {
+				left = getRelativeBlock(1,0,1);
 				left.setType(Material.TORCH);				
 			}
 			Torch lefttorch = new Torch(left.getType(),left.getData());
@@ -403,10 +405,12 @@ public class RailDriverTask implements Runnable {
 
 			getRelativeBlock(1,1,0).setType(Material.POWERED_RAIL);
 
-			Block right = getRelativeBlock(1,2,1);
+			Block right;
 			if (nexttorch) {
+				right = getRelativeBlock(1,2,1);
 				right.setType(Material.TORCH);				
 			} else {
+				right = getRelativeBlock(1,2,0);
 				right.setType(Material.REDSTONE_TORCH_ON);
 			}
 			Torch righttorch = new Torch(right.getType(),right.getData());
