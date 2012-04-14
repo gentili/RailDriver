@@ -391,7 +391,7 @@ public class RailDriverTask implements Runnable {
 				getRelativeBlock(1,3,ly-1).setTypeId(98);
 			}
 			
-			Block left = getRelativeBlock(1,0,1);
+			Block left = getRelativeBlock(1,0,nexttorch?0:1);
 			if (nexttorch) {
 				left.setType(Material.REDSTONE_TORCH_ON);
 			} else {
@@ -403,7 +403,7 @@ public class RailDriverTask implements Runnable {
 
 			getRelativeBlock(1,1,0).setType(Material.POWERED_RAIL);
 
-			Block right = getRelativeBlock(1,2,1);
+			Block right = getRelativeBlock(1,2,nexttorch?1:0);
 			if (nexttorch) {
 				right.setType(Material.TORCH);				
 			} else {
