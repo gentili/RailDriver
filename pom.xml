@@ -5,12 +5,14 @@
   <artifactId>RailDriver</artifactId>
   <version>0.2</version>
   <packaging>jar</packaging>
-	<name>RailDriver</name>
-	<url>http://bluesmoke.ca/RailDriver</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+  <name>RailDriver</name>
+  <url>http://bluesmoke.ca/RailDriver</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <build>
       <plugins>
           <plugin>
