@@ -1,12 +1,12 @@
 == CavernCarver ==
 {{http://dev.bukkit.org/media/images/36/845/CavernCarver.PNG|Caverns}}
-This plugin provides a player with the ability to make a cavern of user specified radius carve itself while the player watches from within!  Ore blocks drop expected items.
+This plugin provides a player with the ability to make a cavern of user specified radius carve itself while the player watches from within! Ore blocks drop expected items.
 
 == Installation ==
-Download the jar [[http://dev.bukkit.org/media/files/563/713/CavernCarver-0.2.jar|here]].  Drop it in your plugins directory and go!
+Download the jar [[http://dev.bukkit.org/media/files/563/713/CavernCarver-0.2.jar|here]]. Drop it in your plugins directory and go!
 
 == Configuration ==
-Standard config.yml in the CavernCarver directory.  Default maximum radius set to 15.  Changes with **/cc_maxradius** are persisted here.
+Standard config.yml in the CavernCarver directory. Default maximum radius set to 15. Changes with **/cc_maxradius** are persisted here.
 
 == Commands ==
 <<code yaml>>

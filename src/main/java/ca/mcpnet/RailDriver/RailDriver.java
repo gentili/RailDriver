@@ -419,6 +419,17 @@ public class RailDriver extends JavaPlugin {
 			pi.addItem(new ItemStack(Material.CHEST,1));
 			return true;
 		}
+		
+		// Reload the RailDriver configuration
+		if(cmd.getName().equalsIgnoreCase("rd_reload")) {
+			if(player != null) {
+				player.sendMessage("Reloading RailDriver configuration");
+			} 	
+			
+			this.reloadConfig();
+			log("Configuration reloaded!");
+			return true;
+		}
 		return false;
 	}
 
