@@ -443,6 +443,7 @@ public class RailDriver extends JavaPlugin {
 		}
 		return null;
 	}
+	
 	public RailDriverTask findCreateRailDriverTask(Block block) {
 		Iterator<RailDriverTask> itr = taskset.iterator();
 		while(itr.hasNext()) {
@@ -455,5 +456,15 @@ public class RailDriver extends JavaPlugin {
 		RailDriverTask task = new RailDriverTask(this, block);
 		taskset.add(task);
 		return task;
+	}
+	
+	public void stopPlayerRailDrivers(Player target) {
+		Iterator<RailDriverTask> itr = taskset.iterator();
+		while(itr.hasNext()) {
+			RailDriverTask task = itr.next();
+			if (task.getOwner() == target) {
+				task.deactivate();
+			}
+		}
 	}
 }

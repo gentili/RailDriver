@@ -28,6 +28,7 @@ public class RailDriverTask implements Runnable {
 	private BlockFace direction;
 	private World world;
 	private int taskid;
+	private Player playerOwner = null;
 	int iteration;
 	boolean nexttorch;
 	ArrayList<ItemStack> collecteditems;
@@ -499,13 +500,17 @@ public class RailDriverTask implements Runnable {
 		furnace.update();
 
 	}
-	public void activate() {
+	public void activate(Player actor) {
 		if (taskid != -1) {
 			RailDriver.log("Activation requested on already active raildriver "+taskid);
 			return;
 		}
+		
+		// Keep a reference to the actor for some context checks during operation
+		playerOwner = actor;
+		
 		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 2L);
-		RailDriver.log("Activated "+direction.name()+ "BOUND raildriver "+taskid);
+		RailDriver.log("Player " + playerOwner.getName() + " activated "+direction.name()+ "BOUND raildriver " + taskid);
 		// Light the fires
 		setFurnaceBurning(getRelativeBlock(1,0,0),true);
 		setFurnaceBurning(getRelativeBlock(1,2,0),true);
@@ -516,6 +521,7 @@ public class RailDriverTask implements Runnable {
 			RailDriver.log("Deactivation requested for already inactive raildriver!");
 			return;
 		}
+		playerOwner = null;
 		plugin.getServer().getScheduler().cancelTask(taskid);
 		RailDriver.log("Deactivated raildriver "+taskid);
 		// Shut off furnaces
@@ -525,5 +531,9 @@ public class RailDriverTask implements Runnable {
 		world.playEffect(new Location(world,x,y,z), Effect.EXTINGUISH,0);
 		taskid = -1;
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, this, 10L);
+	}
+	
+	public Player getOwner() {
+		return playerOwner;
 	}
 }

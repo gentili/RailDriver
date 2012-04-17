@@ -1,10 +1,13 @@
 package ca.mcpnet.RailDriver;
 
 import org.bukkit.Material;
+import org.bukkit.material.Lever;
+import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class RailDriverBlockListener implements Listener {
 
@@ -15,23 +18,25 @@ public class RailDriverBlockListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-		if (event.getBlock().getType() == Material.LEVER) {
-			if (event.getOldCurrent() > event.getNewCurrent()) {
-				// If theres a raildriver task associated with this lever then 
-				// we're attempting to deactivate an existing raildriver
-				RailDriverTask task = plugin.findRailDriverTask(event.getBlock());
-				if (task != null) {
-					task.deactivate();
-				}
-			}
-			if (plugin.isRailDriver(event.getBlock())) {
-				if (event.getOldCurrent() < event.getNewCurrent()) {
-					// We're attempting to activate a raildriver
-					RailDriverTask task = plugin.findCreateRailDriverTask(event.getBlock());
-					task.activate();
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if(event.hasBlock()) {
+			Block interactedBlock = event.getClickedBlock();
+			if(interactedBlock != null && interactedBlock.getType() == Material.LEVER) {
+				if(interactedBlock.getBlockPower() > 0) {
+					// Block is already powered, we're about to turn it off
+					RailDriverTask task = plugin.findRailDriverTask(interactedBlock);
+					if(task != null) {
+						task.deactivate();
+					}
+				} else {
+					// Block isn't powered, this interaction will turn it on
+					if(plugin.isRailDriver(interactedBlock)) {
+						RailDriverTask task = plugin.findCreateRailDriverTask(interactedBlock);
+						task.activate(event.getPlayer());
+					}
 				}
 			}
 		}
 	}
+
 }
