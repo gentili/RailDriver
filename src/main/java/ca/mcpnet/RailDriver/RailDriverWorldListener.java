@@ -1,6 +1,6 @@
 package ca.mcpnet.RailDriver;
 
-import org.bukkit.event.player.PlayerQuitEvent;
+
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,8 +18,5 @@ public class RailDriverWorldListener implements Listener {
 //		RailDriver.log(event.getEventName()+":"+event.getChunk());
 //	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		plugin.stopPlayerRailDrivers(event.getPlayer());
-	}
+
 }
