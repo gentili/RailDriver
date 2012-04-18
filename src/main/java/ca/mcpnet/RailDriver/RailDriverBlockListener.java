@@ -1,12 +1,10 @@
 package ca.mcpnet.RailDriver;
 
 import org.bukkit.Material;
-import org.bukkit.material.Lever;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class RailDriverBlockListener implements Listener {

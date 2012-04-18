@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Torch;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import ca.mcpnet.RailDriver.RailDriver.Facing;
 
@@ -447,6 +448,19 @@ public class RailDriverTask implements Runnable {
 		}
 	}
 
+	// Check if we're allowed to break a particular block
+	// This can be extended to include additional cases (exclusion lists etc..)
+	// We probably should introduce any other checks as well (including isLiquid) into here
+	private boolean canBreakBlock(Block blockToBreak) {
+		if(playerOwner == null) {
+			return false;
+		}
+		
+		BlockBreakEvent canBreak = new BlockBreakEvent(blockToBreak, playerOwner);
+		plugin.getServer().getPluginManager().callEvent(canBreak);
+		return !canBreak.isCancelled();
+	}
+	
 	private boolean excavate() {
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
@@ -454,8 +468,14 @@ public class RailDriverTask implements Runnable {
 				if (block.isLiquid()) {					
 					return false; 
 				}
+				
+				// TODO: Test this adheres to all world guard and related type of protections
+				if(!canBreakBlock(block)) {
+					return false;
+				}
+				
 				if (!block.isEmpty()) {
-					collecteditems.add(new ItemStack(block.getType(),1));
+					collecteditems.addAll(block.getDrops());
 					block.setType(Material.AIR);
 				}
 			}
