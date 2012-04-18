@@ -332,9 +332,10 @@ public class RailDriver extends JavaPlugin {
 		log("RailDriver v"+VERSION+" Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		
-		pm.registerEvents(new RailDriverBlockListener(this), this);
+		pm.registerEvents(new RailDriverPlayerListener(this), this);
 		
-		// World listener just logs atm, so commenting out for release
+		// Due to ongoing work, theres nothing in these atm, so commenting them out for now
+		//pm.registerEvents(new RailDriverBlockListener(this), this);
 		//pm.registerEvents(new RailDriverWorldListener(this), this);
 		
 		getConfig().options().copyDefaults(true);
