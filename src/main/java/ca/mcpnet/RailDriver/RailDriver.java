@@ -332,9 +332,10 @@ public class RailDriver extends JavaPlugin {
 		log("RailDriver v"+VERSION+" Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		
-		pm.registerEvents(new RailDriverBlockListener(this), this);
+		pm.registerEvents(new RailDriverPlayerListener(this), this);
 		
-		// World listener just logs atm, so commenting out for release
+		// Due to ongoing work, theres nothing in these atm, so commenting them out for now
+		//pm.registerEvents(new RailDriverBlockListener(this), this);
 		//pm.registerEvents(new RailDriverWorldListener(this), this);
 		
 		getConfig().options().copyDefaults(true);
@@ -443,6 +444,7 @@ public class RailDriver extends JavaPlugin {
 		}
 		return null;
 	}
+	
 	public RailDriverTask findCreateRailDriverTask(Block block) {
 		Iterator<RailDriverTask> itr = taskset.iterator();
 		while(itr.hasNext()) {
@@ -455,5 +457,15 @@ public class RailDriver extends JavaPlugin {
 		RailDriverTask task = new RailDriverTask(this, block);
 		taskset.add(task);
 		return task;
+	}
+	
+	public void stopPlayerRailDrivers(Player target) {
+		Iterator<RailDriverTask> itr = taskset.iterator();
+		while(itr.hasNext()) {
+			RailDriverTask task = itr.next();
+			if (task.getOwner() == target) {
+				task.deactivate();
+			}
+		}
 	}
 }
