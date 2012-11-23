@@ -1,30 +1,32 @@
-== CavernCarver ==
-{{http://dev.bukkit.org/media/images/36/845/CavernCarver.PNG|Caverns}}
-This plugin provides a player with the ability to make a cavern of user specified radius carve itself while the player watches from within! Ore blocks drop expected items.
+== RailDriver ==
 
-== Installation ==
-Download the jar [[http://dev.bukkit.org/media/files/563/713/CavernCarver-0.2.jar|here]]. Drop it in your plugins directory and go!
+This plugin provides a player with the ability to build a coal powered mining and railroad construction machine!  Check out the [[http://www.youtube.com/watch?v=8I_jQDehT0Q|RailDriver in action]] on youtube!
 
-== Configuration ==
-Standard config.yml in the CavernCarver directory. Default maximum radius set to 15. Changes with **/cc_maxradius** are persisted here.
+=== Installation ===
+Drop the jar in your plugins directory and go!
 
-== Commands ==
+=== Configuration ===
+Standard config.yml in the RailDriver directory.  **Plugin reload is required for config file changes to take effect**
+
+** requires_fuel ** option determines if RailDrivers require fuel and supplies in order to operate.  When set to false, an active RailDriver will not consume coal from the furnaces nor supplies from the chest.
+
+=== Commands ===
 <<code yaml>>
-   cc_cavern:
-      description: carve out a cavern from where the player is standing
-      permission: caverncarver.cc_cavern
-      usage: /cc_cavern size [player]
-   cc_maxradius:
-      description: set the maximum allowable radius for cavern carving
-      permission: caverncarver.cc_maxradius
-      usage: /cc_maxradius radius
+   rd_stock:
+      description: stock the player inventory with all required blocks for building a RailDriver
+      permission: RailDriver.rd_stock
+      usage: /rd_stock [player]
+   rd_devkit:
+      description: stock the player inventory with a developer kit of tools
+      permission: RailDriver.rd_devkit
+      usage: /rd_devkit [player]
 <</code>>
-== Permissions ==
+=== Permissions ===
 <<code yaml>>
-   caverncarver.cc_cavern:
-      description: allows player to execute the cc_cavern command
+   RailDriver.rd_stock:
+      description: allows player to execute the rd_stock command
       default: op
-   caverncarver.cc_maxradius:
-      description: allows player to execute the cc_maxradius command
+   RailDriver.rd_devkit:
+      description: allows player to execute the rd_devkit command
       default: op
 <</code>>

@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 
 public class RailDriver extends JavaPlugin {
 
-	static public final String VERSION = "0.2";
+	static public final String VERSION = "0.3";
 	static Logger logger = Logger.getLogger("Minecraft");
 	static public void log(String msg) {
 		logger.info("[RailDriver] "+msg);
