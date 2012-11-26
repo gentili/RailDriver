@@ -1,16 +1,13 @@
 package ca.mcpnet.RailDriver;
 
 
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class RailDriverWorldListener implements Listener {
 
-	private RailDriver plugin;
+	//private RailDriver plugin;
 	public RailDriverWorldListener(RailDriver instance) {
-		plugin = instance;
+		//plugin = instance;
 	}
 
 //	@EventHandler(priority = EventPriority.NORMAL)

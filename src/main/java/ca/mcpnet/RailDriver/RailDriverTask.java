@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Torch;
-import org.bukkit.event.block.BlockBreakEvent;
 
 import ca.mcpnet.RailDriver.RailDriver.Facing;
 
