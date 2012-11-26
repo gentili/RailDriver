@@ -13,6 +13,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
@@ -463,11 +464,15 @@ public class RailDriverTask implements Runnable {
 			return false;
 		if (blockToBreak.getType() == Material.BEDROCK)
 			return false;
+		// Do Specific WorldGuard test
 		if(plugin.worldguard != null) {
 			if (!plugin.worldguard.canBuild(playerOwner, blockToBreak))
 				return false;
 		}
-		return true;
+		// Use fancy event catching trick 
+		BlockBreakEvent canBreak = new BlockBreakEvent(blockToBreak, playerOwner);
+		plugin.getServer().getPluginManager().callEvent(canBreak);
+		return !canBreak.isCancelled();
 	}
 	
 	private boolean excavate() {
