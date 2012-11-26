@@ -244,6 +244,10 @@ public class RailDriverTask implements Runnable {
 					localbroadcast("Raildriver encountered broken ground!");
 					return false;
 				}
+				if (!canBreakBlock(block)) {
+					localbroadcast("Raildriver encountered unbreakable ground!");
+					return false;
+				}
 			}
 		}
 		// Check to make sure behind has no liquid
@@ -456,28 +460,35 @@ public class RailDriverTask implements Runnable {
 	// This can be extended to include additional cases (exclusion lists etc..)
 	// We probably should introduce any other checks as well (including isLiquid) into here
 	private boolean canBreakBlock(Block blockToBreak) {
-		if(playerOwner == null) {
+		if (blockToBreak.getType() == Material.OBSIDIAN)
 			return false;
+		if (blockToBreak.getType() == Material.BEDROCK)
+			return false;
+		if(plugin.worldguard != null) {
+			if (!plugin.worldguard.canBuild(playerOwner, blockToBreak))
+				return false;
 		}
-		
-		BlockBreakEvent canBreak = new BlockBreakEvent(blockToBreak, playerOwner);
-		plugin.getServer().getPluginManager().callEvent(canBreak);
-		return !canBreak.isCancelled();
+		return true;
 	}
 	
 	private boolean excavate() {
+		// Check all the blocks we're about to excavate
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				Block block = getRelativeBlock((RailDriver.raildriverblocklist[lx][ly]).length, lx, ly);
 				if (block.isLiquid()) {					
 					return false; 
 				}
-				
-				// TODO: Test this adheres to all world guard and related type of protections
 				if(!canBreakBlock(block)) {
 					return false;
 				}
 				
+			}
+		}
+		// OK, no excavate them
+		for (int lx = 0; lx < 3; lx++) {
+			for (int ly = 0; ly < 3; ly++) {
+				Block block = getRelativeBlock((RailDriver.raildriverblocklist[lx][ly]).length, lx, ly);
 				if (!block.isEmpty()) {
 					collecteditems.addAll(block.getDrops());
 					block.setType(Material.AIR);

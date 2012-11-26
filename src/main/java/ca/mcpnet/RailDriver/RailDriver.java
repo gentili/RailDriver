@@ -17,10 +17,13 @@ import org.bukkit.material.Dispenser;
 import org.bukkit.material.Furnace;
 import org.bukkit.material.Lever;
 import org.bukkit.material.PistonBaseMaterial;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
+
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class RailDriver extends JavaPlugin {
 
@@ -31,6 +34,8 @@ public class RailDriver extends JavaPlugin {
 	}
 	
 	PluginManager pm;
+	WorldGuardPlugin worldguard;
+	
 
 	private final ItemStack[] devkit = {
 			new ItemStack(Material.DIAMOND_PICKAXE, 1),
@@ -65,7 +70,7 @@ public class RailDriver extends JavaPlugin {
 	static protected BlockTemplate[][][] raildriverblocklist;
 	
 	HashSet<RailDriverTask> taskset;
-	
+
 	static public enum Facing {
 		FORWARD,
 		LEFT,
@@ -334,6 +339,15 @@ public class RailDriver extends JavaPlugin {
 		
 		pm.registerEvents(new RailDriverPlayerListener(this), this);
 		
+		Plugin plugin = pm.getPlugin("WorldGuard");
+		
+		if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+			log("WorldGuard not detected, WorldGuard support disabled");
+			worldguard = null;
+		} else {
+			log("WorldGuard detected, WorldGuard support enabled");
+			worldguard = (WorldGuardPlugin) plugin;
+		}
 		// Due to ongoing work, theres nothing in these atm, so commenting them out for now
 		//pm.registerEvents(new RailDriverBlockListener(this), this);
 		//pm.registerEvents(new RailDriverWorldListener(this), this);
