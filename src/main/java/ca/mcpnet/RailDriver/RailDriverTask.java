@@ -3,7 +3,9 @@ package ca.mcpnet.RailDriver;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
+import org.bukkit.CoalType;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Furnace;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.Inventory;
@@ -30,6 +33,7 @@ public class RailDriverTask implements Runnable {
 	private World world;
 	private int taskid;
 	private Player playerOwner = null;
+	private int steps = 0;
 	int iteration;
 	boolean nexttorch;
 	ArrayList<ItemStack> collecteditems;
@@ -50,13 +54,13 @@ public class RailDriverTask implements Runnable {
 		nexttorch = false;
 		collecteditems = new ArrayList<ItemStack>();
 		whichdispenser = false;
-		if (direction == BlockFace.EAST) {
+		if (direction == BlockFace.NORTH) {
 			smokedir = 7;
-		} else if (direction == BlockFace.WEST) {
-			smokedir = 1;
 		} else if (direction == BlockFace.SOUTH) {
+			smokedir = 1;
+		} else if (direction == BlockFace.EAST) {
 			smokedir = 3;
-		} else if (direction == BlockFace.NORTH) {
+		} else if (direction == BlockFace.WEST) {
 			smokedir = 5;
 		} else {
 			smokedir = 4;
@@ -65,13 +69,13 @@ public class RailDriverTask implements Runnable {
 	}
 	
 	Block getRelativeBlock(int i, int j, int k) {
-		if (direction == BlockFace.NORTH) {
+		if (direction == BlockFace.WEST) {
 			return world.getBlockAt(x-i,y-1+k,z+1-j);
-		} else if (direction == BlockFace.EAST) {
+		} else if (direction == BlockFace.NORTH) {
 			return world.getBlockAt(x-1+j,y-1+k,z-i);
-		} else if (direction == BlockFace.WEST) {
-			return world.getBlockAt(x+1-j,y-1+k,z+i);
 		} else if (direction == BlockFace.SOUTH) {
+			return world.getBlockAt(x+1-j,y-1+k,z+i);
+		} else if (direction == BlockFace.EAST) {
 			return world.getBlockAt(x+i,y-1+k,z-1+j);
 		} else {
 			return null;
@@ -94,6 +98,7 @@ public class RailDriverTask implements Runnable {
 		block.setData(leverblock.getData());
 	}
 	public void run() {
+		//localbroadcast("itterator:"+iteration);
 		if (taskid == -1) {
 			setMainSwitch(false);
 			setDrillSwitch(false);
@@ -105,8 +110,9 @@ public class RailDriverTask implements Runnable {
 		iteration++;
 		if (iteration == 1) {
 			setDrillSwitch(false);
-			if (plugin.getConfig().getBoolean("requires_fuel")) {
-				if (!burnCoal()) {
+			if (plugin.getConfig().getBoolean("requires_fuel")) 
+			{
+				if (!burnCoal()) {//steps != 0 && 
 					localbroadcast("Raildriver has insufficient fuel!");
 					plugin.taskset.remove(taskid);
 					deactivate();
@@ -186,6 +192,7 @@ public class RailDriverTask implements Runnable {
 				return;
 			}
 			if (!advance()) {
+				
 				deactivate();
 				return;
 			}
@@ -217,22 +224,71 @@ public class RailDriverTask implements Runnable {
 		}
 	}
 
-	private boolean burnCoal() {
+	private ItemStack findCoal(Inventory inventory)
+	{
+		//plugin.logger.info("item:"+inventory);
+		ItemStack[] items =  inventory.getContents();
+		//plugin.logger.info("item length:"+items.length);
+		for (int i = 0; i < items.length; i++) {
+			
+			ItemStack item = items[i]; 
+			//plugin.logger.info("item:"+item);
+			if (item == null) continue;
+			if (item.getType() == Material.COAL)
+			{
+				//plugin.logger.info(item.getData().getData() +" == "+ CoalType.CHARCOAL.getData());
+				if (item.getData().getData() == CoalType.CHARCOAL.getData())
+				{
+					return item;
+				}
+				//plugin.logger.info(item.getData().getData() +" == "+ CoalType.CHARCOAL.getData());
+				if (item.getData().getData() == CoalType.COAL.getData()) 
+				{
+					return item;
+				}
+				return item;
+			}
+		}
+		//plugin.logger.info("coal not fund ?");
+		return null;
+	}
+	
+	private void removeCoal(Inventory inventory)
+	{
+		ItemStack coal =  findCoal(inventory);
+		int amount = coal.getAmount() -1;
+		
+		if (amount == 0)
+			inventory.removeItem(coal);
+		else 
+			coal.setAmount(amount);
+	}
+	
+	private boolean burnCoal() 
+	{
 		Block leftblock = getRelativeBlock(1,0,0);
 		Furnace leftfurnace = (Furnace) leftblock.getState();
 		Inventory leftinventory = leftfurnace.getInventory();
 		Block rightblock = getRelativeBlock(1,2,0);
 		Furnace rightfurnace = (Furnace) rightblock.getState();
 		Inventory rightinventory = rightfurnace.getInventory();
-		if (!leftinventory.contains(Material.COAL) || 
-				(!rightinventory.contains(Material.COAL))) {
-			return false;
+		
+		if (leftinventory.contains(Material.COAL) && (rightinventory.contains(Material.COAL)))
+		{
+			
+			
+			removeCoal(leftinventory);
+			removeCoal(rightinventory);
+	
+			//ItemStack stack  = leftinventory.getItem(new ItemStack(Material.COAL.getId(),1,(short)0))
+			//leftinventory.removeItem(,new ItemStack(Material.COAL,1));
+			//rightinventory.removeItem(new ItemStack(Material.COAL.getId(),1,(short)0),new ItemStack(Material.COAL,1));
+			leftfurnace.update();
+			rightfurnace.update();
+			return true;
 		}
-		leftinventory.removeItem(new ItemStack(Material.COAL.getId(),1,(short)0,(byte)1),new ItemStack(Material.COAL,1));
-		rightinventory.removeItem(new ItemStack(Material.COAL.getId(),1,(short)0,(byte)1),new ItemStack(Material.COAL,1));
-		leftfurnace.update();
-		rightfurnace.update();
-		return true;
+		
+		return false;
 	}
 
 	private boolean advance() {
@@ -240,9 +296,17 @@ public class RailDriverTask implements Runnable {
 		for (int lx = 0; lx < 3; lx++) {
 			for (int lz = 0; lz < RailDriver.raildriverblocklist[lx][0].length; lz++) {
 				Block block = getRelativeBlock(lz,lx,-1);
-				if (block.isEmpty() || block.isLiquid()) {
-					localbroadcast("Raildriver encountered broken ground!");
-					return false;
+				if (!plugin.getConfig().getBoolean("ignore_broken_ground")) 
+				{
+					if (block.isEmpty() || block.isLiquid()) {
+					
+						localbroadcast("Raildriver encountered broken ground!");
+						return false;
+					}
+				}else
+				{
+					//#debug debug
+//@					plugin.logger.info("ignoring broken ground");
 				}
 				if (!canBreakBlock(block)) {
 					localbroadcast("Raildriver encountered unbreakable ground!");
@@ -261,8 +325,8 @@ public class RailDriverTask implements Runnable {
 		// Check to make sure raildriver has enough materials
 		int period = 8;
 		int distance;
-		if (direction == BlockFace.NORTH ||
-				direction == BlockFace.SOUTH) {
+		if (direction == BlockFace.WEST ||
+				direction == BlockFace.EAST) {
 			distance = x;
 		} else {
 			distance = z;
@@ -290,7 +354,7 @@ public class RailDriverTask implements Runnable {
 						!inventory.contains(Material.COBBLESTONE, 9) ||
 						!inventory.contains(Material.STICK, 2) ||
 						!inventory.contains(Material.REDSTONE, 1) ||
-						!inventory.contains(Material.COAL,1)) {
+						findCoal(inventory)== null) {
 					localbroadcast("Raildriver has insufficient building materials for power columns!");
 					return false;				
 				}
@@ -298,8 +362,12 @@ public class RailDriverTask implements Runnable {
 						new ItemStack(Material.POWERED_RAIL,1),
 						new ItemStack(Material.COBBLESTONE,9),
 						new ItemStack(Material.STICK,2),
-						new ItemStack(Material.REDSTONE,1),
-						new ItemStack(Material.COAL,1));					
+						new ItemStack(Material.REDSTONE,1)
+						);
+				
+				removeCoal(inventory);
+						
+						//new ItemStack(Material.COAL,1));					
 			} else {
 				if (!inventory.contains(Material.RAILS, 1)) {
 					// If we don't have rails, we try and convert other materials
@@ -357,6 +425,7 @@ public class RailDriverTask implements Runnable {
 						
 						target.setType(Material.BURNING_FURNACE);
 						Furnace targetfurnace = (Furnace) target.getState();
+						
 						targetfurnace.setData(sourcedata);
 						Inventory targetinventory = targetfurnace.getInventory();
 						targetinventory.setContents(sourceitems);
@@ -382,8 +451,16 @@ public class RailDriverTask implements Runnable {
 			}
 		}
 		// Set the floor made of stone
+		
 		for (int lx = 0; lx < 3; lx++)
-			getRelativeBlock(1,lx,-1).setTypeId(98);
+		{
+			Block floor = getRelativeBlock(1,lx,-1);
+			if (!floor.isEmpty()) {
+				collectBlock(floor.getType());
+				floor.setTypeId(98);
+			}
+		}
+		
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				if (!(lx == 1 && ly == 1)) {
@@ -460,49 +537,220 @@ public class RailDriverTask implements Runnable {
 	// This can be extended to include additional cases (exclusion lists etc..)
 	// We probably should introduce any other checks as well (including isLiquid) into here
 	private boolean canBreakBlock(Block blockToBreak) {
-		if (blockToBreak.getType() == Material.OBSIDIAN)
-			return false;
+		if (!isWaterCooled() && !plugin.getConfig().getBoolean("break_obsidian"))
+		{
+			if (blockToBreak.getType() == Material.OBSIDIAN)
+				return false;
+		}
+		else
+		{
+			//plugin.logger.info("will break lava/obsidian");
+		}
+		
 		if (blockToBreak.getType() == Material.BEDROCK)
 			return false;
 		// Do Specific WorldGuard test
-		if(plugin.worldguard != null) {
-			if (!plugin.worldguard.canBuild(playerOwner, blockToBreak))
-				return false;
-		}
+	
 		// Use fancy event catching trick 
 		BlockBreakEvent canBreak = new BlockBreakEvent(blockToBreak, playerOwner);
 		plugin.getServer().getPluginManager().callEvent(canBreak);
 		return !canBreak.isCancelled();
 	}
 	
+	private boolean isWaterCooled()
+	{
+		if (!plugin.getConfig().getBoolean("water_cooling"))return false;
+		Chest chest = (Chest) getRelativeBlock(1,1,2).getState();
+		if(!chest.getInventory().contains(Material.WATER_BUCKET)) return false;
+		return true;
+		
+	}
+	
+	private boolean useGlass()
+	{
+		if (!plugin.getConfig().getBoolean("use_glass"))return false;
+		Chest chest = (Chest) getRelativeBlock(1,1,2).getState();
+		if(!chest.getInventory().contains(Material.LAVA_BUCKET)) return false;
+		return true;
+		
+	}
+	
 	private boolean excavate() {
+		try
+		{
 		// Check all the blocks we're about to excavate
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				Block block = getRelativeBlock((RailDriver.raildriverblocklist[lx][ly]).length, lx, ly);
-				if (block.isLiquid()) {					
+				//#debug debug
+//@				plugin.logger.info("["+lx+"]" + "["+ly+"]" + block.getType());
+				if (isWaterCooled())
+				{
+					
+					Location loc = block.getLocation();
+					
+					if (block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.LAVA)
+					{			
+						//#debug debug
+//@						plugin.logger.info("converting lava to obsidian");
+						block.setType(Material.OBSIDIAN);
+					}
+					/*
+					if (block.getType() == Material.LAVA)
+					{
+						plugin.logger.info("converting lava to coblestone");
+						block.setType(Material.COBBLESTONE);
+					}*/
+					
+					Chest chest = (Chest) getRelativeBlock(1,1,2).getState();
+					Inventory inventory = chest.getInventory();
+					
+					int radius = 1;
+					boolean sandUsed = false;
+					for (int x = -radius; x <= radius; x++)
+					{
+						for (int y = -radius; y <= radius + (radius<=1 ? 1 : 0); y++)
+						{
+							for (int z = -radius; z <= radius; z++)
+							{
+								Block relativeBlock = world.getBlockAt(loc.getBlockX() + x , loc.getBlockY() + y ,loc.getBlockZ() + z);
+								
+								//plugin.logger.info("relativeBlock: ["+(loc.getBlockX() + x)+"]" + "["+(loc.getBlockY() + y)+"]" +"["+(loc.getBlockZ() + z)+"]" + block.getType());
+								
+								if (relativeBlock.getType() == Material.STATIONARY_LAVA || relativeBlock.getType() == Material.LAVA)
+								{
+									if (useGlass())
+									{
+										if( inventory.contains(Material.SAND) || inventory.contains(Material.GLASS))
+										{
+											//#debug debug
+//@											plugin.logger.info("converting lava to glass");
+											relativeBlock.setType(Material.GLASS);
+	
+											 if (!sandUsed) 
+											 {
+												ItemStack[] items =  inventory.getContents();
+		
+												for (int i = 0; i < items.length; i++)
+												{
+													
+													ItemStack item = items[i]; 
+		
+													if (item == null) continue;
+		
+													if (item.getType() == Material.GLASS ||  item.getType() == Material.SAND)
+													{
+														int amount = item.getAmount() -1;
+														
+														if (amount == 0)
+															inventory.removeItem(item);
+														else 
+															item.setAmount(amount);
+														break;
+													}
+													// only use 1 sand per move
+													sandUsed = true;
+												}	
+											}
+										}
+										else
+										{
+											localbroadcast("Out of glass / sand, add more or remove lava bukket");
+											return false;
+										}
+									}
+									else
+									{
+
+										
+										//#debug debug
+//@										plugin.logger.info("converting lava to obsidian");
+										relativeBlock.setType(Material.OBSIDIAN);
+									}
+								}
+								
+								
+							}
+						}
+					}
+					
+
+				}
+				
+				
+				if (block.isLiquid()) 
+				{
+					
 					return false; 
 				}
-				if(!canBreakBlock(block)) {
+				if(!canBreakBlock(block))
+				{
 					return false;
 				}
 				
 			}
 		}
-		// OK, no excavate them
+		
+		
+		// OK, now excavate them
 		for (int lx = 0; lx < 3; lx++) {
 			for (int ly = 0; ly < 3; ly++) {
 				Block block = getRelativeBlock((RailDriver.raildriverblocklist[lx][ly]).length, lx, ly);
 				if (!block.isEmpty()) {
-					collecteditems.addAll(block.getDrops());
+					collectBlock(block);
+					//collecteditems.addAll(block.getType());
 					block.setType(Material.AIR);
 				}
 			}
 		}
 		itemitr = collecteditems.iterator();
+		//
+		}catch(Exception ex)
+		{
+			//#debug warn
+			plugin.logger.warning("exception:"+ex.getMessage());
+			ex.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 
+	private void collectBlock(Material mat)
+	{
+		if (mat == Material.GLASS) return;
+		if (mat == Material.RAILS) return;
+		if (mat == Material.POWERED_RAIL) return;
+		
+		collecteditems.add(new ItemStack(mat,1));
+		
+		if (!plugin.getConfig().getBoolean("break_blocks"))
+		{
+			collecteditems.add(new ItemStack(mat,1));
+		}else
+		{
+			
+		}
+	}
+	
+	private void collectBlock(Block block)
+	{
+		
+		
+		if (block.getType() == Material.GLASS) return;
+		if (block.getType() == Material.RAILS) return;
+		
+		
+		
+		if (!plugin.getConfig().getBoolean("break_blocks"))
+		{
+			collecteditems.add(new ItemStack(block.getType(),1));
+		}else
+		{
+			
+			collecteditems.addAll(block.getDrops());
+			block.breakNaturally();
+		}
+	}
 	public boolean matchBlock(Block block) {
 		if (block.getLocation().getBlockX() == x &&
 				block.getLocation().getBlockY() == y &&
@@ -541,7 +789,9 @@ public class RailDriverTask implements Runnable {
 	}
 	public void activate(Player actor) {
 		if (taskid != -1) {
+			//#debug info
 			RailDriver.log("Activation requested on already active raildriver "+taskid);
+			
 			return;
 		}
 		
@@ -549,6 +799,7 @@ public class RailDriverTask implements Runnable {
 		playerOwner = actor;
 		
 		taskid = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 10L, 2L);
+		//#debug info
 		RailDriver.log("Player " + playerOwner.getName() + " activated "+direction.name()+ "BOUND raildriver " + taskid);
 		// Light the fires
 		setFurnaceBurning(getRelativeBlock(1,0,0),true);
@@ -557,11 +808,13 @@ public class RailDriverTask implements Runnable {
 	
 	public void deactivate() {
 		if (taskid == -1) {
+			//#debug info
 			RailDriver.log("Deactivation requested for already inactive raildriver!");
 			return;
 		}
 		playerOwner = null;
 		plugin.getServer().getScheduler().cancelTask(taskid);
+		//#debug info
 		RailDriver.log("Deactivated raildriver "+taskid);
 		// Shut off furnaces
 		setFurnaceBurning(getRelativeBlock(1,0,0),false);

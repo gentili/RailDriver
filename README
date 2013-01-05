@@ -1,3 +1,23 @@
+== MOD INFO ==
+This version adds a few tweaks to the original while maintaining most of the same features.
+
+== Tweaks ==
+Note: All tweaks can be turned off in the config file.
+
+0. Break blocks 
+This feature must be set to false due to the problem where the MineCraft client crashes when some blocks are broken/drop is collected. I made it an option as later version of the client might fix this problem.
+
+1. Water-cooling
+Put a water-bucket in the chest to allow RailDriver to convert lava into obsidian and mine it.
+
+2. Glass Walls
+adding sand and a lava-bucket to the chest will make it create glass walls to protect you when drilling through lava.
+
+3. Ignore broken ground:
+will continue on even if  parts of the ground is missing.
+
+
+
 == RailDriver ==
 
 This plugin provides a player with the ability to build a coal powered mining and railroad construction machine!  Check out the [[http://www.youtube.com/watch?v=8I_jQDehT0Q|RailDriver in action]] on youtube!

@@ -1,3 +1,11 @@
 # RailDriver default config.yml
 
+
 requires_fuel: true
+
+#enabling break_blocks in MC 1.4.6 will make the game crash for some reason (the server is unaffected) 
+break_blocks: false
+break_obsidian: true
+water_cooling: true
+ignore_broken_ground: true
+use_glass: true

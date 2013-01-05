@@ -17,13 +17,12 @@ import org.bukkit.material.Dispenser;
 import org.bukkit.material.Furnace;
 import org.bukkit.material.Lever;
 import org.bukkit.material.PistonBaseMaterial;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 
 public class RailDriver extends JavaPlugin {
 
@@ -34,7 +33,7 @@ public class RailDriver extends JavaPlugin {
 	}
 	
 	PluginManager pm;
-	WorldGuardPlugin worldguard;
+	
 	
 
 	private final ItemStack[] devkit = {
@@ -81,10 +80,10 @@ public class RailDriver extends JavaPlugin {
 		DONTCARE;
 		
 		static private final BlockFace horizBlockFaceArray[] = {
-			BlockFace.NORTH,
 			BlockFace.WEST,
 			BlockFace.SOUTH,
-			BlockFace.EAST
+			BlockFace.EAST,
+			BlockFace.NORTH
 		};
 		
 		public boolean checkFace(BlockFace direction, BlockFace blockdirection) {
@@ -102,13 +101,13 @@ public class RailDriver extends JavaPlugin {
 		}
 		
 		public BlockFace translate(BlockFace direction) {
-			if (direction == BlockFace.NORTH) {
+			if (direction == BlockFace.WEST) {
 				return horizBlockFaceArray[this.ordinal()];
-			} else if (direction == BlockFace.WEST) {
-				return horizBlockFaceArray[(this.ordinal() + 1) % 4];
 			} else if (direction == BlockFace.SOUTH) {
-				return horizBlockFaceArray[(this.ordinal() + 2) % 4];
+				return horizBlockFaceArray[(this.ordinal() + 1) % 4];
 			} else if (direction == BlockFace.EAST) {
+				return horizBlockFaceArray[(this.ordinal() + 2) % 4];
+			} else if (direction == BlockFace.NORTH) {
 				return horizBlockFaceArray[(this.ordinal() + 3) % 4];
 			} else {
 				return null;
@@ -266,6 +265,8 @@ public class RailDriver extends JavaPlugin {
 	 * @return
 	 */
 	boolean isRailDriver(Block block) {
+		//#debug debug
+//@		logger.info("validation construction");
 		// First is this block a lever block
 		if (block.getType() != Material.LEVER)
 			return false;
@@ -274,30 +275,34 @@ public class RailDriver extends JavaPlugin {
 		BlockFace direction = lever.getAttachedFace();
 		Vector directionVector;
 		// RailDriver.log.info(direction.name());
-		if (direction == BlockFace.NORTH) {
+		if (direction == BlockFace.WEST) {
 			directionVector = new Vector(-1,0,0);
-		} else if (direction == BlockFace.SOUTH) {
-			directionVector = new Vector(1,0,0);
 		} else if (direction == BlockFace.EAST) {
+			directionVector = new Vector(1,0,0);
+		} else if (direction == BlockFace.NORTH) {
 			directionVector = new Vector(0,0,-1);
-		} else if (direction == BlockFace.WEST) {
+		} else if (direction == BlockFace.SOUTH) {
 			directionVector = new Vector(0,0,1);
 		} else {
+			//#debug debug
+//@			logger.info("validation FAILED");
 			return false;
 		}
 	
 		for (int j = 0; j < 3; j++) {
 			for (int k = 0; k < 3; k++) {
 				Vector startBlock = null;
-				if (direction == BlockFace.NORTH) {
+				if (direction == BlockFace.WEST) {
 					startBlock = new Vector(block.getX(),block.getY()-1+k,block.getZ()-1+j);
-				} else if (direction == BlockFace.EAST) {
+				} else if (direction == BlockFace.NORTH) {
 					startBlock = new Vector(block.getX()-1+j,block.getY()-1+k,block.getZ());
-				} else if (direction == BlockFace.WEST) {
-					startBlock = new Vector(block.getX()+1-j,block.getY()-1+k,block.getZ());
 				} else if (direction == BlockFace.SOUTH) {
+					startBlock = new Vector(block.getX()+1-j,block.getY()-1+k,block.getZ());
+				} else if (direction == BlockFace.EAST) {
 						startBlock = new Vector(block.getX(),block.getY()-1+k,block.getZ()+1-j);
 				} else {
+					//#debug debug
+//@					logger.info("validation FAILED");
 					return false;
 				}
 				/*
@@ -323,31 +328,29 @@ public class RailDriver extends JavaPlugin {
 					Block b = bitr.next();
 					// RailDriver.log.info("Checking Block "+b.getType().name()+ " against template "+i);
 					BlockTemplate bt = RailDriver.raildriverblocklist[j][k][i];
-					if (!bt.checkBlock(b, direction)) {
+					if (!bt.checkBlock(b, direction)) 
+					{
+						//#debug debug
+//@						logger.info("validation FAILED");
 							return false;
 					}
 				}
 			}
 		}
+		//#debug debug
+//@		logger.info("validation OK");
 		return true;
 	}
 
 	// Bukkit Callbacks
 	public void onEnable() {
-		log("RailDriver v"+VERSION+" Plugin Enabled!");
+		//#debug debug
+//@		log("RailDriver v"+VERSION+" Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		
 		pm.registerEvents(new RailDriverPlayerListener(this), this);
 		
-		Plugin plugin = pm.getPlugin("WorldGuard");
 		
-		if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
-			log("WorldGuard not detected, WorldGuard support disabled");
-			worldguard = null;
-		} else {
-			log("WorldGuard detected, WorldGuard support enabled");
-			worldguard = (WorldGuardPlugin) plugin;
-		}
 		// Due to ongoing work, theres nothing in these atm, so commenting them out for now
 		//pm.registerEvents(new RailDriverBlockListener(this), this);
 		//pm.registerEvents(new RailDriverWorldListener(this), this);
@@ -455,6 +458,11 @@ public class RailDriver extends JavaPlugin {
 			if (task.matchBlock(block)) {
 				return task;
 			}
+			else
+			{
+				logger.info("not a railDriver");
+			}
+			
 		}
 		return null;
 	}
