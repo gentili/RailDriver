@@ -455,7 +455,12 @@ public class RailDriverTask implements Runnable {
 		for (int lx = 0; lx < 3; lx++)
 		{
 			Block floor = getRelativeBlock(1,lx,-1);
-			if (!floor.isEmpty()) {
+			if (plugin.getConfig().getBoolean("ignore_broken_ground"))
+			{
+				collectBlock(floor.getType());
+				floor.setTypeId(98);
+			}
+			else if (!floor.isEmpty()) {
 				collectBlock(floor.getType());
 				floor.setTypeId(98);
 			}
