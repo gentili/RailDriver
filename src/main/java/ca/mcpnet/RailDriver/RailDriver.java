@@ -26,7 +26,7 @@ import org.bukkit.util.Vector;
 
 public class RailDriver extends JavaPlugin {
 
-	static public final String VERSION = "0.4";
+	static public final String VERSION = "0.5";
 	static Logger logger = Logger.getLogger("Minecraft");
 	static public void log(String msg) {
 		logger.info("[RailDriver] "+msg);
@@ -345,7 +345,7 @@ public class RailDriver extends JavaPlugin {
 	// Bukkit Callbacks
 	public void onEnable() {
 		//#debug debug
-//@		log("RailDriver v"+VERSION+" Plugin Enabled!");
+		log("RailDriver v"+VERSION+" Plugin Enabled!");
 		pm = getServer().getPluginManager();
 		
 		pm.registerEvents(new RailDriverPlayerListener(this), this);
