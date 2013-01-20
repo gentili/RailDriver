@@ -1,7 +1,8 @@
 name: RailDriver
 main: ca.mcpnet.RailDriver.RailDriver
-version: 0.4
-author: globnobulous
+version: 0.4.5 (m0rkeulv mod)
+author: globnobulous ( bugfix + some new features by m0rkeulv)
+description: A modified version of RailDriver made to work with Bukkit 1.4.6 and later
 commands:
    rd_stock:
       description: stock the player inventory with all required blocks for building a raildriver

@@ -10,7 +10,7 @@ public class RailDriverWorldListener implements Listener {
 		//plugin = instance;
 	}
 
-//	@EventHandler(priority = EventPriority.NORMAL)
+//	[EventHandler(priority = EventPriority.NORMAL)]
 //	public void onChunkLoad(ChunkLoadEvent event) {		
 //		RailDriver.log(event.getEventName()+":"+event.getChunk());
 //	}
